@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@nx/react": "^21.2.1"
+  }
+}
