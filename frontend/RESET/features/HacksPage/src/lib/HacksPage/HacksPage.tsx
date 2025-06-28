@@ -1,28 +1,12 @@
 import styles from './HacksPage.module.css';
-import { HackDto, GraphQueryUrl, GraphQueryAPIKey } from 'models';
-import { HackCard } from '../HackCard/HackCard';
+
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-
 import { useQuery } from '@tanstack/react-query';
-import { gql, request } from 'graphql-request';
+import { request } from 'graphql-request';
 
-const query = gql`
-  {
-    incidentApproveds(first: 5) {
-      id
-      requestId
-      incidentAddress
-      protocolName
-      hackedAmount
-      hackerAddress
-      txHash
-      initialOfferAmount
-      initialOfferValidity
-      creator
-    }
-  }
-`;
+import { HackDto, GraphQueryUrl, GraphQueryAPIKey, HacksQuery } from 'models';
+import { HackCard } from '../HackCard/HackCard';
 
 export function HacksPage() {
   const [hacks, setHacks] = useState<HackDto[]>([]);
@@ -33,7 +17,7 @@ export function HacksPage() {
     async queryFn(): Promise<{ incidentApproveds: HackDto[] }> {
       return await request(
         GraphQueryUrl,
-        query,
+        HacksQuery,
         {},
         { Authorization: `Bearer ${GraphQueryAPIKey}` }
       );

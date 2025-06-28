@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAccount } from 'wagmi';
 import styles from './CreateHackPage.module.css';
-import { RequestHackDto } from 'models';
+import { RequestHackDto, RESETRoutes } from 'models';
 import { RequestHack } from 'SCService';
+import { useNavigate } from 'react-router-dom';
 
 export function CreateHackPage() {
+  const navigation = useNavigate();
+  
   const {
     register,
     handleSubmit,
@@ -24,8 +27,12 @@ export function CreateHackPage() {
     }
   }, [isConnected, address, setValue]);
 
-  const onSubmit = (data: RequestHackDto) => {
-    RequestHack(data);
+  const onSubmit = async (data: RequestHackDto) => {
+    const goToAllHacks = await RequestHack(data);
+
+    if(goToAllHacks){
+      navigation(RESETRoutes.Hacks);
+    }
   };
 
   return (

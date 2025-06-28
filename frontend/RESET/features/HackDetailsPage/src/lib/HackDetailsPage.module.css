@@ -1,7 +1,55 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
+.hack-details-page {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: row;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.offers-section {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-grow: 1;
+}
+
+.hack-card {
+  border: 1px solid #121217;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  background-color: #24242e;
+  flex-grow: 1;
+  align-content: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hack-item {
+  margin-bottom: 8px;
+}
+
+.label {
+  font-size: larger;
+  font-weight: bold;
+  color: #dddde3;
+}
+
+.value {
+  font-size: large;
+  margin-left: 8px;
+  color: #dddde3;
+  word-wrap: break-word; /* Ensures long words break */
+  overflow-wrap: break-word; /* Ensures text wraps within the container */
+  white-space: normal; /* Allows text to wrap */
+}
+
+
