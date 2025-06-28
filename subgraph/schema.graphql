@@ -5,7 +5,7 @@ type IncidentApproved @entity(immutable: true) {
   protocolName: String! # string
   hackedAmount: BigInt! # uint256
   hackerAddress: Bytes! # address
-  transactionHash: Bytes! # bytes32
+  txHash: Bytes! # bytes32
   initialOfferAmount: BigInt! # uint256
   initialOfferValidity: BigInt! # uint256
   creator: Bytes! # address

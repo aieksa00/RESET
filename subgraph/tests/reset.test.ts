@@ -26,7 +26,7 @@ describe("Describe entity assertions", () => {
     let hackerAddress = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
-    let transactionHash = Bytes.fromI32(1234567890)
+    let txHash = Bytes.fromI32(1234567890)
     let initialOfferAmount = BigInt.fromI32(234)
     let initialOfferValidity = BigInt.fromI32(234)
     let creator = Address.fromString(
@@ -38,7 +38,7 @@ describe("Describe entity assertions", () => {
       protocolName,
       hackedAmount,
       hackerAddress,
-      transactionHash,
+      txHash,
       initialOfferAmount,
       initialOfferValidity,
       creator
@@ -90,7 +90,7 @@ describe("Describe entity assertions", () => {
     assert.fieldEquals(
       "IncidentApproved",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "transactionHash",
+      "txHash",
       "1234567890"
     )
     assert.fieldEquals(

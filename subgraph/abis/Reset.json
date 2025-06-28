@@ -58,7 +58,7 @@
       {
         "indexed": false,
         "internalType": "bytes32",
-        "name": "transactionHash",
+        "name": "txHash",
         "type": "bytes32"
       },
       {
@@ -184,11 +184,7 @@
       },
       { "internalType": "uint256", "name": "hackedAmount", "type": "uint256" },
       { "internalType": "address", "name": "hackerAddress", "type": "address" },
-      {
-        "internalType": "bytes32",
-        "name": "transactionHash",
-        "type": "bytes32"
-      },
+      { "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
       {
         "internalType": "uint256",
         "name": "initialOfferAmount",
@@ -243,11 +239,7 @@
       },
       { "internalType": "uint256", "name": "hackedAmount", "type": "uint256" },
       { "internalType": "address", "name": "hackerAddress", "type": "address" },
-      {
-        "internalType": "bytes32",
-        "name": "transactionHash",
-        "type": "bytes32"
-      },
+      { "internalType": "bytes32", "name": "txHash", "type": "bytes32" },
       {
         "internalType": "uint256",
         "name": "initialOfferAmount",

@@ -20,7 +20,7 @@ export function handleIncidentApproved(event: IncidentApprovedEvent): void {
   entity.protocolName = event.params.protocolName
   entity.hackedAmount = event.params.hackedAmount
   entity.hackerAddress = event.params.hackerAddress
-  entity.transactionHash = event.params.transactionHash
+  entity.txHash = event.params.txHash
   entity.initialOfferAmount = event.params.initialOfferAmount
   entity.initialOfferValidity = event.params.initialOfferValidity
   entity.creator = event.params.creator

@@ -13,7 +13,7 @@ contract Reset is Ownable2Step {
         address exploitedAddress;
         uint256 hackedAmount;
         address hackerAddress;
-        bytes32 transactionHash;
+        bytes32 txHash;
         uint256 initialOfferAmount;
         uint256 initialOfferValidity;
         address creator;
@@ -26,7 +26,7 @@ contract Reset is Ownable2Step {
     address public weth;
 
     event IncidentRequested(uint256 indexed requestId, address indexed creator);
-    event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string indexed protocolName, uint256 hackedAmount, address hackerAddress, bytes32 transactionHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
+    event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string indexed protocolName, uint256 hackedAmount, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
 
     constructor(address _weth) Ownable(_msgSender()) {
         weth = _weth;
@@ -37,7 +37,7 @@ contract Reset is Ownable2Step {
         address exploitedAddress,
         uint256 hackedAmount,
         address hackerAddress,
-        bytes32 transactionHash,
+        bytes32 txHash,
         uint256 initialOfferAmount,
         uint256 initialOfferValidity
     ) external {
@@ -46,7 +46,7 @@ contract Reset is Ownable2Step {
             exploitedAddress: exploitedAddress,
             hackedAmount: hackedAmount,
             hackerAddress: hackerAddress,
-            transactionHash: transactionHash,
+            txHash: txHash,
             initialOfferAmount: initialOfferAmount,
             initialOfferValidity: initialOfferValidity,
             creator: msg.sender,
@@ -76,7 +76,7 @@ contract Reset is Ownable2Step {
             incidentRequest.exploitedAddress,
             incidentRequest.hackedAmount,
             incidentRequest.hackerAddress,
-            incidentRequest.transactionHash,
+            incidentRequest.txHash,
             incidentRequest.initialOfferAmount,
             incidentRequest.initialOfferValidity,
             incidentRequest.creator,
@@ -85,7 +85,7 @@ contract Reset is Ownable2Step {
 
         incidents.push(address(incident));
 
-        emit IncidentApproved(requestId, address(incident), incidentRequest.protocolName, incidentRequest.hackedAmount, incidentRequest.hackerAddress, incidentRequest.transactionHash, incidentRequest.initialOfferAmount, incidentRequest.initialOfferValidity, incidentRequest.creator);
+        emit IncidentApproved(requestId, address(incident), incidentRequest.protocolName, incidentRequest.hackedAmount, incidentRequest.hackerAddress, incidentRequest.txHash, incidentRequest.initialOfferAmount, incidentRequest.initialOfferValidity, incidentRequest.creator);
     }
 
     function getAllIncidents() external view returns (address[] memory) {

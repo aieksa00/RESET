@@ -13,7 +13,7 @@ export function createIncidentApprovedEvent(
   protocolName: string,
   hackedAmount: BigInt,
   hackerAddress: Address,
-  transactionHash: Bytes,
+  txHash: Bytes,
   initialOfferAmount: BigInt,
   initialOfferValidity: BigInt,
   creator: Address
@@ -53,10 +53,7 @@ export function createIncidentApprovedEvent(
     )
   )
   incidentApprovedEvent.parameters.push(
-    new ethereum.EventParam(
-      "transactionHash",
-      ethereum.Value.fromFixedBytes(transactionHash)
-    )
+    new ethereum.EventParam("txHash", ethereum.Value.fromFixedBytes(txHash))
   )
   incidentApprovedEvent.parameters.push(
     new ethereum.EventParam(
