@@ -4,6 +4,22 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
+interface IReset {
+    function emitNewOffer(
+        address incident,
+        uint256 offerId,
+        Incident.Proposer proposer,
+        uint256 returnAmount,
+        uint256 validUntil
+    ) external;
+
+    function emitOfferAccepted(
+        address incident,
+        string memory protocolName,
+        uint256 returnedAmount
+    ) external;
+}
+
 contract Incident is Ownable {
     using SafeERC20 for IERC20;
 
@@ -45,8 +61,7 @@ contract Incident is Ownable {
 
     IERC20 public weth;
 
-    event NewOffer(uint256 indexed offerId, Proposer proposer, uint256 returnAmount, uint256 validUntil);
-    event OfferAccepted(string indexed protocolName, uint256 indexed returnedAmount);
+    address public reset;
 
     modifier onlyHackerOrOwner() {
         if (msg.sender != hackerAddress && msg.sender != owner()) {
@@ -80,6 +95,7 @@ contract Incident is Ownable {
         transactionHash = _transactionHash;
         status = Status.Active;
         weth = IERC20(_weth);
+        reset = msg.sender;
 
         _newOffer(Proposer.Protocol, _initialOfferAmount, _initialOfferValidity);
     }
@@ -98,9 +114,17 @@ contract Incident is Ownable {
             accepted: false
         });
 
-        // ako je haker da approvuje ovaj contract
+        if (_proposer == Proposer.Hacker) {
+            weth.forceApprove(address(this), _returnAmount);
+        }
 
-        emit NewOffer(offersCount, _proposer, _returnAmount, _validUntil);
+        IReset(reset).emitNewOffer(
+            address(this),
+            offersCount,
+            _proposer,
+            _returnAmount,
+            _validUntil
+        );
 
         offersCount++;
     }
@@ -134,7 +158,11 @@ contract Incident is Ownable {
             _acceptOfferProtocol(offer);
         }
 
-        emit OfferAccepted(protocolName, offer.returnAmount);
+        IReset(reset).emitOfferAccepted(
+            address(this),
+            protocolName,
+            offer.returnAmount
+        );
     }
 
     function _acceptOfferHacker(Offer storage offer) internal onlyHacker {
