@@ -19,6 +19,11 @@ export function handleIncidentApproved(event: IncidentApprovedEvent): void {
   entity.incidentAddress = event.params.incidentAddress
   entity.protocolName = event.params.protocolName
   entity.hackedAmount = event.params.hackedAmount
+  entity.hackerAddress = event.params.hackerAddress
+  entity.transactionHash = event.params.transactionHash
+  entity.initialOfferAmount = event.params.initialOfferAmount
+  entity.initialOfferValidity = event.params.initialOfferValidity
+  entity.creator = event.params.creator
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

@@ -1,5 +1,5 @@
 import { newMockEvent } from "matchstick-as"
-import { ethereum, BigInt, Address } from "@graphprotocol/graph-ts"
+import { ethereum, BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
 import {
   IncidentApproved,
   IncidentRequested,
@@ -11,7 +11,12 @@ export function createIncidentApprovedEvent(
   requestId: BigInt,
   incidentAddress: Address,
   protocolName: string,
-  hackedAmount: BigInt
+  hackedAmount: BigInt,
+  hackerAddress: Address,
+  transactionHash: Bytes,
+  initialOfferAmount: BigInt,
+  initialOfferValidity: BigInt,
+  creator: Address
 ): IncidentApproved {
   let incidentApprovedEvent = changetype<IncidentApproved>(newMockEvent())
 
@@ -40,6 +45,33 @@ export function createIncidentApprovedEvent(
       "hackedAmount",
       ethereum.Value.fromUnsignedBigInt(hackedAmount)
     )
+  )
+  incidentApprovedEvent.parameters.push(
+    new ethereum.EventParam(
+      "hackerAddress",
+      ethereum.Value.fromAddress(hackerAddress)
+    )
+  )
+  incidentApprovedEvent.parameters.push(
+    new ethereum.EventParam(
+      "transactionHash",
+      ethereum.Value.fromFixedBytes(transactionHash)
+    )
+  )
+  incidentApprovedEvent.parameters.push(
+    new ethereum.EventParam(
+      "initialOfferAmount",
+      ethereum.Value.fromUnsignedBigInt(initialOfferAmount)
+    )
+  )
+  incidentApprovedEvent.parameters.push(
+    new ethereum.EventParam(
+      "initialOfferValidity",
+      ethereum.Value.fromUnsignedBigInt(initialOfferValidity)
+    )
+  )
+  incidentApprovedEvent.parameters.push(
+    new ethereum.EventParam("creator", ethereum.Value.fromAddress(creator))
   )
 
   return incidentApprovedEvent

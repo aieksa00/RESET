@@ -1,253 +1,283 @@
 [
   {
-    "type": "constructor",
     "inputs": [
-      { "name": "_weth", "type": "address", "internalType": "address" }
+      { "internalType": "address", "name": "_weth", "type": "address" }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
-  { "name": "IncidentAlreadyApproved", "type": "error", "inputs": [] },
-  { "name": "IncidentDoesNotExist", "type": "error", "inputs": [] },
+  { "inputs": [], "name": "IncidentAlreadyApproved", "type": "error" },
+  { "inputs": [], "name": "IncidentDoesNotExist", "type": "error" },
   {
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" }
+    ],
     "name": "OwnableInvalidOwner",
-    "type": "error",
-    "inputs": [
-      { "name": "owner", "type": "address", "internalType": "address" }
-    ]
+    "type": "error"
   },
   {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
     "name": "OwnableUnauthorizedAccount",
-    "type": "error",
-    "inputs": [
-      { "name": "account", "type": "address", "internalType": "address" }
-    ]
+    "type": "error"
   },
   {
-    "name": "IncidentApproved",
-    "type": "event",
+    "anonymous": false,
     "inputs": [
       {
-        "name": "requestId",
-        "type": "uint256",
         "indexed": true,
-        "internalType": "uint256"
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
       },
       {
+        "indexed": true,
+        "internalType": "address",
         "name": "incidentAddress",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       },
       {
+        "indexed": true,
+        "internalType": "string",
         "name": "protocolName",
-        "type": "string",
-        "indexed": true,
-        "internalType": "string"
+        "type": "string"
       },
       {
-        "name": "hackedAmount",
-        "type": "uint256",
         "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "name": "IncidentRequested",
-    "type": "event",
-    "inputs": [
-      {
-        "name": "requestId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
+        "internalType": "uint256",
+        "name": "hackedAmount",
+        "type": "uint256"
       },
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "hackerAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "transactionHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "initialOfferAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "initialOfferValidity",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "creator",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
+        "type": "address"
       }
     ],
-    "anonymous": false
+    "name": "IncidentApproved",
+    "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      }
+    ],
+    "name": "IncidentRequested",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
     "name": "OwnershipTransferStarted",
-    "type": "event",
-    "inputs": [
-      {
-        "name": "previousOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
+    "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
     "name": "OwnershipTransferred",
-    "type": "event",
-    "inputs": [
-      {
-        "name": "previousOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
+    "type": "event"
   },
   {
+    "inputs": [],
     "name": "acceptOwnership",
-    "type": "function",
-    "inputs": [],
     "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
+    "inputs": [
+      { "internalType": "uint256", "name": "requestId", "type": "uint256" }
+    ],
     "name": "approveIncident",
-    "type": "function",
-    "inputs": [
-      { "name": "requestId", "type": "uint256", "internalType": "uint256" }
-    ],
     "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
+    "inputs": [],
     "name": "getAllIncidents",
-    "type": "function",
-    "inputs": [],
     "outputs": [
-      { "name": "", "type": "address[]", "internalType": "address[]" }
+      { "internalType": "address[]", "name": "", "type": "address[]" }
     ],
-    "stateMutability": "view"
+    "stateMutability": "view",
+    "type": "function"
   },
   {
+    "inputs": [],
     "name": "incidentRequestCount",
-    "type": "function",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
-    "stateMutability": "view"
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "name": "incidentRequests",
-    "type": "function",
-    "inputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "outputs": [
-      { "name": "protocolName", "type": "string", "internalType": "string" },
+      { "internalType": "string", "name": "protocolName", "type": "string" },
       {
+        "internalType": "address",
         "name": "exploitedAddress",
-        "type": "address",
-        "internalType": "address"
+        "type": "address"
       },
-      { "name": "hackedAmount", "type": "uint256", "internalType": "uint256" },
-      { "name": "hackerAddress", "type": "address", "internalType": "address" },
+      { "internalType": "uint256", "name": "hackedAmount", "type": "uint256" },
+      { "internalType": "address", "name": "hackerAddress", "type": "address" },
       {
+        "internalType": "bytes32",
         "name": "transactionHash",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "type": "bytes32"
       },
       {
+        "internalType": "uint256",
         "name": "initialOfferAmount",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint256"
       },
       {
+        "internalType": "uint256",
         "name": "initialOfferValidity",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint256"
       },
-      { "name": "creator", "type": "address", "internalType": "address" },
-      { "name": "approved", "type": "bool", "internalType": "bool" }
+      { "internalType": "address", "name": "creator", "type": "address" },
+      { "internalType": "bool", "name": "approved", "type": "bool" }
     ],
-    "stateMutability": "view"
+    "stateMutability": "view",
+    "type": "function"
   },
   {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "name": "incidents",
-    "type": "function",
-    "inputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
-    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
-    "stateMutability": "view"
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
+    "inputs": [],
     "name": "owner",
-    "type": "function",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
-    "stateMutability": "view"
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
+    "inputs": [],
     "name": "pendingOwner",
-    "type": "function",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
-    "stateMutability": "view"
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
+    "inputs": [],
     "name": "renounceOwnership",
-    "type": "function",
-    "inputs": [],
     "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    "name": "requestIncident",
-    "type": "function",
     "inputs": [
-      { "name": "protocolName", "type": "string", "internalType": "string" },
+      { "internalType": "string", "name": "protocolName", "type": "string" },
       {
+        "internalType": "address",
         "name": "exploitedAddress",
-        "type": "address",
-        "internalType": "address"
+        "type": "address"
       },
-      { "name": "hackedAmount", "type": "uint256", "internalType": "uint256" },
-      { "name": "hackerAddress", "type": "address", "internalType": "address" },
+      { "internalType": "uint256", "name": "hackedAmount", "type": "uint256" },
+      { "internalType": "address", "name": "hackerAddress", "type": "address" },
       {
+        "internalType": "bytes32",
         "name": "transactionHash",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "type": "bytes32"
       },
       {
+        "internalType": "uint256",
         "name": "initialOfferAmount",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint256"
       },
       {
+        "internalType": "uint256",
         "name": "initialOfferValidity",
-        "type": "uint256",
-        "internalType": "uint256"
+        "type": "uint256"
       }
     ],
+    "name": "requestIncident",
     "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    "name": "transferOwnership",
-    "type": "function",
     "inputs": [
-      { "name": "newOwner", "type": "address", "internalType": "address" }
+      { "internalType": "address", "name": "newOwner", "type": "address" }
     ],
+    "name": "transferOwnership",
     "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    "name": "weth",
-    "type": "function",
     "inputs": [],
-    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
-    "stateMutability": "view"
+    "name": "weth",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
   }
 ]
