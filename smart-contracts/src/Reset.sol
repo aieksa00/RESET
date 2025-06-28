@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 contract Reset is Ownable2Step {
     error IncidentDoesNotExist();
     error IncidentAlreadyApproved();
+    error OnlyIncidentCanCall();
 
     struct IncidentRequest {
         string protocolName;
@@ -23,6 +24,8 @@ contract Reset is Ownable2Step {
     mapping(uint256 => IncidentRequest) public incidentRequests;
     uint256 public incidentRequestCount;
     address[] public incidents;
+    mapping(address => bool) public isIncident;
+
     address public weth;
 
     event IncidentRequested(uint256 indexed requestId, address indexed creator);
@@ -30,6 +33,14 @@ contract Reset is Ownable2Step {
 
     event NewOffer(address indexed incident, uint256 indexed offerId, uint8 indexed proposer, uint256 returnAmount, uint256 validUntil);
     event OfferAccepted(address indexed incident, string indexed protocolName, uint256 indexed returnedAmount);
+
+    modifier onlyIncident() {
+        if (!isIncident[msg.sender]) {
+            revert OnlyIncidentCanCall();
+        }
+        _;
+    }
+
 
     constructor(address _weth) Ownable(_msgSender()) {
         weth = _weth;
@@ -87,6 +98,7 @@ contract Reset is Ownable2Step {
         );
 
         incidents.push(address(incident));
+        isIncident[address(incident)] = true;
 
         emit IncidentApproved(requestId, address(incident), incidentRequest.protocolName, incidentRequest.hackedAmount, incidentRequest.hackerAddress, incidentRequest.txHash, incidentRequest.initialOfferAmount, incidentRequest.initialOfferValidity, incidentRequest.creator);
     }
@@ -101,7 +113,7 @@ contract Reset is Ownable2Step {
         uint8 proposer,
         uint256 returnAmount,
         uint256 validUntil
-    ) external {
+    ) external onlyIncident {
         emit NewOffer(incident, offerId, proposer, returnAmount, validUntil);
     }
 
@@ -109,7 +121,7 @@ contract Reset is Ownable2Step {
         address incident,
         string memory protocolName,
         uint256 returnedAmount
-    ) external {
+    ) external onlyIncident {
         emit OfferAccepted(incident, protocolName, returnedAmount);
     }
 
