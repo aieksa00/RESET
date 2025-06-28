@@ -8,9 +8,9 @@ dataSources:
     name: Reset
     network: sepolia
     source:
-      address: "0x89c8C96b788B6c320E3F5B7701A9f2C4EEda7528"
+      address: "0xff0d42F42c770806e4D9cc4BbE7a4e2CB87bdEb5"
       abi: Reset
-      startBlock: 8648902
+      startBlock: 8648963
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
