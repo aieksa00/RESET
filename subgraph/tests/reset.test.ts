@@ -23,6 +23,9 @@ describe("Describe entity assertions", () => {
     )
     let protocolName = "Example string value"
     let hackedAmount = BigInt.fromI32(234)
+    let exploitedAddress = Address.fromString(
+      "0x0000000000000000000000000000000000000001"
+    )
     let hackerAddress = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
@@ -37,6 +40,7 @@ describe("Describe entity assertions", () => {
       incidentAddress,
       protocolName,
       hackedAmount,
+      exploitedAddress,
       hackerAddress,
       txHash,
       initialOfferAmount,
@@ -80,6 +84,12 @@ describe("Describe entity assertions", () => {
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "hackedAmount",
       "234"
+    )
+    assert.fieldEquals(
+      "IncidentApproved",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "exploitedAddress",
+      "0x0000000000000000000000000000000000000001"
     )
     assert.fieldEquals(
       "IncidentApproved",
