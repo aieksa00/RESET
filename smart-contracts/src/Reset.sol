@@ -49,6 +49,13 @@ contract Reset is Ownable2Step, ReentrancyGuard {
         _;
     }
 
+    modifier onlyIncidentOrOwner() {
+        if (!owner() && !isIncident[_msgSender()]) {
+            revert OnlyIncidentCanCall();
+        }
+        _;
+    }
+
     constructor(address _weth, uint256 _fee) Ownable(_msgSender()) {
         weth = _weth;
         fee = _fee;
@@ -125,7 +132,7 @@ contract Reset is Ownable2Step, ReentrancyGuard {
         uint8 _proposer,
         uint256 _returnAmount,
         uint256 _validUntil
-    ) external onlyIncident {
+    ) external onlyIncidentOrOwner {
         emit NewOffer(_incident, _offerId, _proposer, _returnAmount, _validUntil);
     }
 
