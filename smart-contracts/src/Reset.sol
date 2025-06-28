@@ -28,6 +28,9 @@ contract Reset is Ownable2Step {
     event IncidentRequested(uint256 indexed requestId, address indexed creator);
     event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string indexed protocolName, uint256 hackedAmount, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
 
+    event NewOffer(address indexed incident, uint256 indexed offerId, Incident.Proposer indexed proposer, uint256 returnAmount, uint256 validUntil);
+    event OfferAccepted(address indexed incident, string indexed protocolName, uint256 indexed returnedAmount);
+
     constructor(address _weth) Ownable(_msgSender()) {
         weth = _weth;
     }
@@ -90,6 +93,24 @@ contract Reset is Ownable2Step {
 
     function getAllIncidents() external view returns (address[] memory) {
         return incidents;
+    }
+
+    function emitNewOffer(
+        address incident,
+        uint256 offerId,
+        Incident.Proposer proposer,
+        uint256 returnAmount,
+        uint256 validUntil
+    ) external {
+        emit NewOffer(incident, offerId, proposer, returnAmount, validUntil);
+    }
+
+    function emitOfferAccepted(
+        address incident,
+        string memory protocolName,
+        uint256 returnedAmount
+    ) external {
+        emit OfferAccepted(incident, protocolName, returnedAmount);
     }
 
 }
