@@ -16,6 +16,8 @@ interface IReset {
 
     function getAllIncidents() external view returns (address[] memory);
 
+    function getIncident(uint256 _incidentId) external view returns (address);
+
     function emitNewOffer(
         address _incident,
         uint256 _offerId,

@@ -236,6 +236,10 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         offer.offerStatus = OfferStatus.Rejected;
     }
 
+    function getHackerAddress() external view returns (address) {
+        return hackerAddress;
+    }
+
     receive() external payable {}
 
     fallback() external payable {}

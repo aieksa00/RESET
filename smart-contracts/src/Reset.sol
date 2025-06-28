@@ -135,6 +135,14 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
         return incidents;
     }
 
+    function getIncident(uint256 _incidentId) external view returns (address) {
+        if (_incidentId >= incidents.length) {
+            revert IncidentDoesNotExist();
+        }
+
+        return incidents[_incidentId];
+    }
+
     function emitNewOffer(
         address _incident,
         uint256 _offerId,
