@@ -3,6 +3,8 @@ import { ethereum, BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
 import {
   IncidentApproved,
   IncidentRequested,
+  NewOffer,
+  OfferAccepted,
   OwnershipTransferStarted,
   OwnershipTransferred
 } from "../generated/Reset/Reset"
@@ -93,6 +95,76 @@ export function createIncidentRequestedEvent(
   )
 
   return incidentRequestedEvent
+}
+
+export function createNewOfferEvent(
+  incident: Address,
+  offerId: BigInt,
+  proposer: i32,
+  returnAmount: BigInt,
+  validUntil: BigInt
+): NewOffer {
+  let newOfferEvent = changetype<NewOffer>(newMockEvent())
+
+  newOfferEvent.parameters = new Array()
+
+  newOfferEvent.parameters.push(
+    new ethereum.EventParam("incident", ethereum.Value.fromAddress(incident))
+  )
+  newOfferEvent.parameters.push(
+    new ethereum.EventParam(
+      "offerId",
+      ethereum.Value.fromUnsignedBigInt(offerId)
+    )
+  )
+  newOfferEvent.parameters.push(
+    new ethereum.EventParam(
+      "proposer",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(proposer))
+    )
+  )
+  newOfferEvent.parameters.push(
+    new ethereum.EventParam(
+      "returnAmount",
+      ethereum.Value.fromUnsignedBigInt(returnAmount)
+    )
+  )
+  newOfferEvent.parameters.push(
+    new ethereum.EventParam(
+      "validUntil",
+      ethereum.Value.fromUnsignedBigInt(validUntil)
+    )
+  )
+
+  return newOfferEvent
+}
+
+export function createOfferAcceptedEvent(
+  incident: Address,
+  protocolName: string,
+  returnedAmount: BigInt
+): OfferAccepted {
+  let offerAcceptedEvent = changetype<OfferAccepted>(newMockEvent())
+
+  offerAcceptedEvent.parameters = new Array()
+
+  offerAcceptedEvent.parameters.push(
+    new ethereum.EventParam("incident", ethereum.Value.fromAddress(incident))
+  )
+  offerAcceptedEvent.parameters.push(
+    new ethereum.EventParam(
+      "protocolName",
+      ethereum.Value.fromString(protocolName)
+    )
+  )
+  offerAcceptedEvent.parameters.push(
+    new ethereum.EventParam(
+      "returnedAmount",
+      ethereum.Value.fromUnsignedBigInt(returnedAmount)
+    )
+  )
+
+  return offerAcceptedEvent
 }
 
 export function createOwnershipTransferStartedEvent(

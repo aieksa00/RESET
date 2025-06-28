@@ -108,6 +108,68 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "incident",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "proposer",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "validUntil",
+        "type": "uint256"
+      }
+    ],
+    "name": "NewOffer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "incident",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "protocolName",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "returnedAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "OfferAccepted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "previousOwner",
         "type": "address"
       },
@@ -152,6 +214,30 @@
       { "internalType": "uint256", "name": "requestId", "type": "uint256" }
     ],
     "name": "approveIncident",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "incident", "type": "address" },
+      { "internalType": "uint256", "name": "offerId", "type": "uint256" },
+      { "internalType": "uint8", "name": "proposer", "type": "uint8" },
+      { "internalType": "uint256", "name": "returnAmount", "type": "uint256" },
+      { "internalType": "uint256", "name": "validUntil", "type": "uint256" }
+    ],
+    "name": "emitNewOffer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "incident", "type": "address" },
+      { "internalType": "string", "name": "protocolName", "type": "string" },
+      { "internalType": "uint256", "name": "returnedAmount", "type": "uint256" }
+    ],
+    "name": "emitOfferAccepted",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
