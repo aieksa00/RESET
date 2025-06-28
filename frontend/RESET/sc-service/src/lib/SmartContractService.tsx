@@ -2,9 +2,10 @@ import styles from './SmartContractService.module.css';
 
 import { ethers, isError } from 'ethers';
 import resetAbi from './common/resetABI.json';
+import incidentAbi from './common/incidentABI.json';
 import Swal from 'sweetalert2';
 
-import { RequestHackDto, ResetContractAddress } from 'models';
+import { CreateOfferFormData, RequestHackDto, ResetContractAddress } from 'models';
 
 declare global {
   interface Window {
@@ -12,11 +13,11 @@ declare global {
   }
 }
 
-export async function RequestHack(requestHack: RequestHackDto): Promise<any> {
+export async function RequestHack(requestHack: RequestHackDto): Promise<boolean> {
   // Check if MetaMask is installed and connected
   const isMetaMaskConnected = await CheckMetaMask();
   if (!isMetaMaskConnected) {
-    return;
+    return false;
   }
 
   const provider = new ethers.BrowserProvider(window.ethereum);
@@ -53,7 +54,8 @@ export async function RequestHack(requestHack: RequestHackDto): Promise<any> {
     });
 
     const receipt = await provider.waitForTransaction(tx.hash);
-    console.log('Transaction receipt:', receipt);
+
+    Swal.close();
 
     await Swal.fire({
       icon: 'success',
@@ -64,6 +66,8 @@ export async function RequestHack(requestHack: RequestHackDto): Promise<any> {
         confirmButton: styles['swal-ok-button'],
       },
     });
+
+    return true;
   } catch (error: any) {
     console.error('Transaction error:', error);
     if (isError(error, 'ACTION_REJECTED')) {
@@ -75,7 +79,6 @@ export async function RequestHack(requestHack: RequestHackDto): Promise<any> {
           confirmButton: styles['swal-ok-button'],
         },
       });
-      return;
     } else {
       await Swal.fire({
         icon: 'error',
@@ -86,6 +89,82 @@ export async function RequestHack(requestHack: RequestHackDto): Promise<any> {
         },
       });
     }
+    return false;
+  }
+}
+
+export async function NewOffer(incidentAddress: string, newOffer: CreateOfferFormData): Promise<boolean> {
+  // Check if MetaMask is installed and connected
+  const isMetaMaskConnected = await CheckMetaMask();
+  if (!isMetaMaskConnected) {
+    return false;
+  }
+
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+
+  const incidentContract = new ethers.Contract(
+    incidentAddress,
+    incidentAbi,
+    signer
+  );
+
+  const timeTicks: number =
+    new Date(newOffer.validUntil).getTime() / 1000;
+
+  try {
+    const tx = await incidentContract.newOffer(
+      ethers.parseEther(newOffer.amount.toString()),
+      timeTicks
+    );
+
+    Swal.fire({
+      title: 'Processing Transaction',
+      text: 'Please wait while your transaction is being processed...',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      willOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const receipt = await provider.waitForTransaction(tx.hash);
+    
+    Swal.close();
+
+    await Swal.fire({
+      icon: 'success',
+      title: 'Offer Requested',
+      html: `Your offer request has been successfully submitted.<br>
+            <a href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank" rel="noopener noreferrer">Click here to open transation in explorer...</a>`,
+      customClass: {
+        confirmButton: styles['swal-ok-button'],
+      },
+    });
+
+    return true;
+  } catch (error: any) {
+    console.error('Transaction error:', error);
+    if (isError(error, 'ACTION_REJECTED')) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Transaction Cancelled',
+        text: 'You have cancelled the transaction.',
+        customClass: {
+          confirmButton: styles['swal-ok-button'],
+        },
+      });
+    } else {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Transaction Error',
+        text: 'An error occurred while processing the transaction.\nPlease try again later.',
+        customClass: {
+          confirmButton: styles['swal-ok-button'],
+        },
+      });
+    }
+    return false;
   }
 }
 

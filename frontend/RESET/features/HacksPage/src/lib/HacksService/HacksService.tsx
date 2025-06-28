@@ -1,5 +1,4 @@
-import { ethers } from "ethers";
-
+import { ethers } from 'ethers';
 
 export function shortenAddress(address: string, chars = 4): string {
   if (!address) return '';
@@ -8,9 +7,8 @@ export function shortenAddress(address: string, chars = 4): string {
 
 export const decodeProtocolName = (hexString: string): string => {
   try {
-    return ethers.toUtf8String(hexString);
+    return ethers.decodeBytes32String(hexString);
   } catch (error) {
-    console.error('Error decoding protocol name:', error);
     return 'Invalid Protocol Name';
   }
 };

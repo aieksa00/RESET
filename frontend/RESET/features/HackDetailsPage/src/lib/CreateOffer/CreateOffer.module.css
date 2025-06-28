@@ -1,15 +1,7 @@
-.report-hack-page {
-  display: flex;
-  width: 100%;
-}
-
-.hack-form {
+.offer-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin: 0 auto;
-  max-width: 630px;
-  width: 100%;
   border: 1px solid #121217;
   border-radius: 8px;
   padding: 16px;
@@ -18,7 +10,7 @@
   background-color: #24242e;
 }
 
-.hack-form fieldset {
+.offer-form fieldset {
   border: none; /* Remove the default border */
   margin: 0; /* Remove default margin */
   padding: 0; /* Remove default padding */
