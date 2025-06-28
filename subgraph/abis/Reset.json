@@ -151,65 +151,21 @@
         "internalType": "uint256",
         "name": "validUntil",
         "type": "uint256"
-      }
-    ],
-    "name": "NewOffer",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "incident",
-        "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "string",
-        "name": "protocolName",
-        "type": "string"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "returnedAmount",
-        "type": "uint256"
-      }
-    ],
-    "name": "OfferAccepted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "incident",
-        "type": "address"
-      },
-      {
-        "indexed": true,
+        "indexed": false,
         "internalType": "string",
         "name": "protocolName",
         "type": "string"
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "returnedAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint8",
-        "name": "proposer",
+        "internalType": "enum Reset.OfferEventType",
+        "name": "eventType",
         "type": "uint8"
       }
     ],
-    "name": "OfferRejected",
+    "name": "OfferEvent",
     "type": "event"
   },
   {
@@ -273,7 +229,8 @@
       { "internalType": "uint256", "name": "_offerId", "type": "uint256" },
       { "internalType": "uint8", "name": "_proposer", "type": "uint8" },
       { "internalType": "uint256", "name": "_returnAmount", "type": "uint256" },
-      { "internalType": "uint256", "name": "_validUntil", "type": "uint256" }
+      { "internalType": "uint256", "name": "_validUntil", "type": "uint256" },
+      { "internalType": "string", "name": "_protocolName", "type": "string" }
     ],
     "name": "emitNewOffer",
     "outputs": [],
@@ -283,12 +240,11 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_incident", "type": "address" },
-      { "internalType": "string", "name": "_protocolName", "type": "string" },
-      {
-        "internalType": "uint256",
-        "name": "_returnedAmount",
-        "type": "uint256"
-      }
+      { "internalType": "uint256", "name": "_offerId", "type": "uint256" },
+      { "internalType": "uint8", "name": "_proposer", "type": "uint8" },
+      { "internalType": "uint256", "name": "_returnAmount", "type": "uint256" },
+      { "internalType": "uint256", "name": "_validUntil", "type": "uint256" },
+      { "internalType": "string", "name": "_protocolName", "type": "string" }
     ],
     "name": "emitOfferAccepted",
     "outputs": [],
@@ -298,13 +254,11 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_incident", "type": "address" },
-      { "internalType": "string", "name": "_protocolName", "type": "string" },
-      {
-        "internalType": "uint256",
-        "name": "_returnedAmount",
-        "type": "uint256"
-      },
-      { "internalType": "uint8", "name": "_proposer", "type": "uint8" }
+      { "internalType": "uint256", "name": "_offerId", "type": "uint256" },
+      { "internalType": "uint8", "name": "_proposer", "type": "uint8" },
+      { "internalType": "uint256", "name": "_returnAmount", "type": "uint256" },
+      { "internalType": "uint256", "name": "_validUntil", "type": "uint256" },
+      { "internalType": "string", "name": "_protocolName", "type": "string" }
     ],
     "name": "emitOfferRejected",
     "outputs": [],

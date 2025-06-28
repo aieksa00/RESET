@@ -120,7 +120,8 @@ contract Incident is Ownable2Step, ReentrancyGuard {
             offersCount,
             uint8(_proposer),
             _returnAmount,
-            _validUntil
+            _validUntil,
+            protocolName
         );
 
         offersCount++;
@@ -157,8 +158,11 @@ contract Incident is Ownable2Step, ReentrancyGuard {
 
         IReset(reset).emitOfferAccepted(
             address(this),
-            protocolName,
-            offer.returnAmount
+            _offerId,
+            uint8(offer.proposer),
+            offer.returnAmount,
+            offer.validUntil,
+            protocolName
         );
     }
 
@@ -215,9 +219,11 @@ contract Incident is Ownable2Step, ReentrancyGuard {
 
         IReset(reset).emitOfferRejected(
             address(this),
-            protocolName,
+            _offerId,
+            uint8(offer.proposer),
             offer.returnAmount,
-            uint8(offer.proposer)
+            offer.validUntil,
+            protocolName
         );
     }
 

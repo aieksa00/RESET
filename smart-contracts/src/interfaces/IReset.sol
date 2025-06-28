@@ -21,20 +21,26 @@ interface IReset {
         uint256 _offerId,
         uint8 _proposer,
         uint256 _returnAmount,
-        uint256 _validUntil
+        uint256 _validUntil,
+        string memory _protocolName
     ) external;
 
     function emitOfferAccepted(
         address _incident,
-        string memory _protocolName,
-        uint256 _returnedAmount
+        uint256 _offerId,
+        uint8 _proposer,
+        uint256 _returnAmount,
+        uint256 _validUntil,
+        string memory _protocolName
     ) external;
 
     function emitOfferRejected(
         address _incident,
-        string memory _protocolName,
-        uint256 _returnedAmount,
-        uint8 _proposer
+        uint256 _offerId,
+        uint8 _proposer,
+        uint256 _returnAmount,
+        uint256 _validUntil,
+        string memory _protocolName
     ) external;
 
     function getFee() external view returns (uint256);
