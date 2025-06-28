@@ -1,0 +1,35 @@
+specVersion: 1.3.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Reset
+    network: sepolia
+    source:
+      address: "0xeaE9eD41f77de72104E9bdaEA523d08417A6E703"
+      abi: Reset
+      startBlock: 8646901
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - IncidentApproved
+        - IncidentRequested
+        - OwnershipTransferStarted
+        - OwnershipTransferred
+      abis:
+        - name: Reset
+          file: ./abis/Reset.json
+      eventHandlers:
+        - event: IncidentApproved(indexed uint256,indexed address,indexed string,uint256,address,bytes32,uint256,uint256,address)
+          handler: handleIncidentApproved
+        - event: IncidentRequested(indexed uint256,indexed address)
+          handler: handleIncidentRequested
+        - event: OwnershipTransferStarted(indexed address,indexed address)
+          handler: handleOwnershipTransferStarted
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+      file: ./src/reset.ts

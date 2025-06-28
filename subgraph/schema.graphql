@@ -1,0 +1,42 @@
+type IncidentApproved @entity(immutable: true) {
+  id: Bytes!
+  requestId: BigInt! # uint256
+  incidentAddress: Bytes! # address
+  protocolName: Bytes! # indexed string, appears as Bytes
+  hackedAmount: BigInt! # uint256
+  hackerAddress: Bytes! # address
+  txHash: Bytes! # bytes32
+  initialOfferAmount: BigInt! # uint256
+  initialOfferValidity: BigInt! # uint256
+  creator: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type IncidentRequested @entity(immutable: true) {
+  id: Bytes!
+  requestId: BigInt! # uint256
+  creator: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OwnershipTransferStarted @entity(immutable: true) {
+  id: Bytes!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OwnershipTransferred @entity(immutable: true) {
+  id: Bytes!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
