@@ -3,11 +3,16 @@ pragma solidity ^0.8.24;
 
 import "./Incident.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract Reset is Ownable2Step {
+contract Reset is Ownable2Step, ReentrancyGuard {
+    using SafeERC20 for IERC20;
+
     error IncidentDoesNotExist();
     error IncidentAlreadyApproved();
     error OnlyIncidentCanCall();
+    error cantOfferMoreThanHackedAmount();
 
     struct IncidentRequest {
         string protocolName;
@@ -28,56 +33,63 @@ contract Reset is Ownable2Step {
 
     address public weth;
 
+    uint256 public fee; // in bps
+
     event IncidentRequested(uint256 indexed requestId, address indexed creator);
-    event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string indexed protocolName, uint256 hackedAmount, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
+    event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string indexed protocolName, uint256 hackedAmount, address exploitedAddress, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
 
     event NewOffer(address indexed incident, uint256 indexed offerId, uint8 indexed proposer, uint256 returnAmount, uint256 validUntil);
     event OfferAccepted(address indexed incident, string indexed protocolName, uint256 indexed returnedAmount);
+    event OfferRejected(address indexed incident, string indexed protocolName, uint256 returnedAmount, uint8 proposer);
 
     modifier onlyIncident() {
-        if (!isIncident[msg.sender]) {
+        if (!isIncident[_msgSender()]) {
             revert OnlyIncidentCanCall();
         }
         _;
     }
 
-
-    constructor(address _weth) Ownable(_msgSender()) {
+    constructor(address _weth, uint256 _fee) Ownable(_msgSender()) {
         weth = _weth;
+        fee = _fee;
     }
 
     function requestIncident(
-        string memory protocolName,
-        address exploitedAddress,
-        uint256 hackedAmount,
-        address hackerAddress,
-        bytes32 txHash,
-        uint256 initialOfferAmount,
-        uint256 initialOfferValidity
+        string memory _protocolName,
+        address _exploitedAddress,
+        uint256 _hackedAmount,
+        address _hackerAddress,
+        bytes32 _txHash,
+        uint256 _initialOfferAmount,
+        uint256 _initialOfferValidity
     ) external {
+        if (_initialOfferAmount > _hackedAmount) {
+            revert cantOfferMoreThanHackedAmount();
+        }
+
         incidentRequests[incidentRequestCount] = IncidentRequest({
-            protocolName: protocolName,
-            exploitedAddress: exploitedAddress,
-            hackedAmount: hackedAmount,
-            hackerAddress: hackerAddress,
-            txHash: txHash,
-            initialOfferAmount: initialOfferAmount,
-            initialOfferValidity: initialOfferValidity,
-            creator: msg.sender,
+            protocolName: _protocolName,
+            exploitedAddress: _exploitedAddress,
+            hackedAmount: _hackedAmount,
+            hackerAddress: _hackerAddress,
+            txHash: _txHash,
+            initialOfferAmount: _initialOfferAmount,
+            initialOfferValidity: _initialOfferValidity,
+            creator: _msgSender(),
             approved: false
         });
 
-        emit IncidentRequested(incidentRequestCount, msg.sender);
+        emit IncidentRequested(incidentRequestCount, _msgSender());
 
         incidentRequestCount++;
     }
 
-    function approveIncident(uint256 requestId) external onlyOwner {
-        if (requestId >= incidentRequestCount) {
+    function approveIncident(uint256 _requestId) external onlyOwner {
+        if (_requestId >= incidentRequestCount) {
             revert IncidentDoesNotExist();
         }
 
-        IncidentRequest storage incidentRequest = incidentRequests[requestId];
+        IncidentRequest storage incidentRequest = incidentRequests[_requestId];
 
         if (incidentRequest.approved) {
             revert IncidentAlreadyApproved();
@@ -100,7 +112,7 @@ contract Reset is Ownable2Step {
         incidents.push(address(incident));
         isIncident[address(incident)] = true;
 
-        emit IncidentApproved(requestId, address(incident), incidentRequest.protocolName, incidentRequest.hackedAmount, incidentRequest.hackerAddress, incidentRequest.txHash, incidentRequest.initialOfferAmount, incidentRequest.initialOfferValidity, incidentRequest.creator);
+        emit IncidentApproved(_requestId, address(incident), incidentRequest.protocolName, incidentRequest.hackedAmount, incidentRequest.exploitedAddress, incidentRequest.hackerAddress, incidentRequest.txHash, incidentRequest.initialOfferAmount, incidentRequest.initialOfferValidity, incidentRequest.creator);
     }
 
     function getAllIncidents() external view returns (address[] memory) {
@@ -108,21 +120,42 @@ contract Reset is Ownable2Step {
     }
 
     function emitNewOffer(
-        address incident,
-        uint256 offerId,
-        uint8 proposer,
-        uint256 returnAmount,
-        uint256 validUntil
+        address _incident,
+        uint256 _offerId,
+        uint8 _proposer,
+        uint256 _returnAmount,
+        uint256 _validUntil
     ) external onlyIncident {
-        emit NewOffer(incident, offerId, proposer, returnAmount, validUntil);
+        emit NewOffer(_incident, _offerId, _proposer, _returnAmount, _validUntil);
     }
 
     function emitOfferAccepted(
-        address incident,
-        string memory protocolName,
-        uint256 returnedAmount
+        address _incident,
+        string memory _protocolName,
+        uint256 _returnedAmount
     ) external onlyIncident {
-        emit OfferAccepted(incident, protocolName, returnedAmount);
+        emit OfferAccepted(_incident, _protocolName, _returnedAmount);
     }
+
+    function emitOfferRejected(
+        address _incident,
+        string memory _protocolName,
+        uint256 _returnedAmount,
+        uint8 _proposer
+    ) external onlyIncident {
+        emit OfferRejected(_incident, _protocolName, _returnedAmount, _proposer);
+    }
+
+    function getFee() external view returns (uint256) {
+        return fee;
+    }
+
+     function withdraw(address _receiver) external onlyOwner nonReentrant {
+         IERC20(weth).safeTransfer(_receiver, IERC20(weth).balanceOf(address(this)));
+    }
+
+    receive() external payable {}
+
+    fallback() external payable {}
 
 }

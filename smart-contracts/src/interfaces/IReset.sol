@@ -3,30 +3,41 @@ pragma solidity ^0.8.24;
 
 interface IReset {
     function requestIncident(
-        string memory protocolName,
-        address exploitedAddress,
-        uint256 hackedAmount,
-        address hackerAddress,
-        bytes32 transactionHash,
-        uint256 initialOfferAmount,
-        uint256 initialOfferValidity
+        string memory _protocolName,
+        address _exploitedAddress,
+        uint256 _hackedAmount,
+        address _hackerAddress,
+        bytes32 _transactionHash,
+        uint256 _initialOfferAmount,
+        uint256 _initialOfferValidity
     ) external;
 
-    function approveIncident(uint256 requestId) external;
+    function approveIncident(uint256 _requestId) external;
 
     function getAllIncidents() external view returns (address[] memory);
 
     function emitNewOffer(
-        address incident,
-        uint256 offerId,
-        uint8 proposer,
-        uint256 returnAmount,
-        uint256 validUntil
+        address _incident,
+        uint256 _offerId,
+        uint8 _proposer,
+        uint256 _returnAmount,
+        uint256 _validUntil
     ) external;
 
     function emitOfferAccepted(
-        address incident,
-        string memory protocolName,
-        uint256 returnedAmount
+        address _incident,
+        string memory _protocolName,
+        uint256 _returnedAmount
     ) external;
+
+    function emitOfferRejected(
+        address _incident,
+        string memory _protocolName,
+        uint256 _returnedAmount,
+        uint8 _proposer
+    ) external;
+
+    function getFee() external view returns (uint256);
+
+    function withdraw(address _receiver) external;
 }
