@@ -2,7 +2,7 @@ type IncidentApproved @entity(immutable: true) {
   id: Bytes!
   requestId: BigInt! # uint256
   incidentAddress: Bytes! # address
-  protocolName: String! # string
+  protocolName: Bytes! # indexed string
   hackedAmount: BigInt! # uint256
   exploitedAddress: Bytes! # address
   hackerAddress: Bytes! # address

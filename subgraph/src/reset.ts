@@ -12,6 +12,7 @@ import {
   OwnershipTransferStarted,
   OwnershipTransferred
 } from "../generated/schema"
+import { Bytes } from "@graphprotocol/graph-ts";
 
 export function handleIncidentApproved(event: IncidentApprovedEvent): void {
   let entity = new IncidentApproved(
@@ -50,9 +51,11 @@ export function handleIncidentRequested(event: IncidentRequestedEvent): void {
 }
 
 export function handleOfferEvent(event: OfferEventEvent): void {
-  let entity = new OfferEvent(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
+  //let entity = new OfferEvent(
+  //  event.transaction.hash.concatI32(event.logIndex.toI32())
+  //)
+  let id = event.params.incident.toHex() + "-" + event.params.offerId.toString();
+  let entity = new OfferEvent(Bytes.fromUTF8(id));
   entity.incident = event.params.incident
   entity.offerId = event.params.offerId
   entity.proposer = event.params.proposer
