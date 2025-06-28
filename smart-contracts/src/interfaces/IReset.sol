@@ -15,4 +15,18 @@ interface IReset {
     function approveIncident(uint256 requestId) external;
 
     function getAllIncidents() external view returns (address[] memory);
+
+    function emitNewOffer(
+        address incident,
+        uint256 offerId,
+        uint8 proposer,
+        uint256 returnAmount,
+        uint256 validUntil
+    ) external;
+
+    function emitOfferAccepted(
+        address incident,
+        string memory protocolName,
+        uint256 returnedAmount
+    ) external;
 }
