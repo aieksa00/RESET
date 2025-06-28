@@ -2,7 +2,7 @@ type IncidentApproved @entity(immutable: true) {
   id: Bytes!
   requestId: BigInt! # uint256
   incidentAddress: Bytes! # address
-  protocolName: String! # string
+  protocolName: Bytes! # string
   hackedAmount: BigInt! # uint256
   exploitedAddress: Bytes! # address
   hackerAddress: Bytes! # address
@@ -39,7 +39,7 @@ type NewOffer @entity(immutable: true) {
 type OfferAccepted @entity(immutable: true) {
   id: Bytes!
   incident: Bytes! # address
-  protocolName: String! # string
+  protocolName: Bytes! # string
   returnedAmount: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -49,7 +49,7 @@ type OfferAccepted @entity(immutable: true) {
 type OfferRejected @entity(immutable: true) {
   id: Bytes!
   incident: Bytes! # address
-  protocolName: String! # string
+  protocolName: Bytes! # string
   returnedAmount: BigInt! # uint256
   proposer: Int! # uint8
   blockNumber: BigInt!
