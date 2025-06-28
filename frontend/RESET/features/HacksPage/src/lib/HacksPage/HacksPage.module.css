@@ -1,0 +1,62 @@
+.container {
+}
+
+.hack-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+}
+
+.form {
+  display: grid;
+  grid-template-rows: auto auto; /* Two rows: one for the search bar and one for the button */
+  grid-template-columns: 1fr; /* One column */
+  gap: 8px; /* Space between rows */
+  margin-bottom: 16px;
+}
+
+.input-container {
+  grid-row: 1; /* First row */
+  grid-column: 1; /* 0 column */
+}
+
+.search-bar {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #6e00db;
+}
+
+.error-border {
+  border-color: #ff4500;
+}
+
+.error-message {
+  color: #ff4500;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.search-button {
+  grid-row: 2; /* Second row */
+  grid-column: 1; /* First column */
+  padding: 8px 16px;
+  background-color: #6e00db;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: fit-content;
+}
+
+.search-button:hover {
+  background-color: #5a00b5;
+}

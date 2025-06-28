@@ -1,0 +1,59 @@
+/* Layout for the app */
+.app-layout {
+    display: flex;
+    height: 100vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
+  }
+  
+  /* Sidebar styling */
+  .sidebar {
+    background-color: #17171d; /* Dark background */
+    border-right: 1px solid #dddde3; /* Optional: Divider */
+    width: 150px;
+  }
+  
+  /* Scrollbar styling */
+  .routes::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+  }
+  
+  .routes::-webkit-scrollbar-track {
+    background: #17171d; /* Match the background */
+  }
+  
+  .routes::-webkit-scrollbar-thumb {
+    background: #24242e; /* Scrollbar thumb color */
+    border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+  }
+  
+  .routes::-webkit-scrollbar-thumb:hover {
+    background: #dddde3; /* Darker color on hover */
+  }
+  
+  /* Routes section styling */
+  .routes {
+    padding: 32px; /* Padding for larger screens */
+    overflow-y: auto; /* Enable scrolling if content overflows */
+    width: calc(100% - 150px);
+  }
+  
+  /* Header styling (RESET label and ConnectButton) */
+  .header {
+    display: flex;
+    justify-content: space-between; /* Align RESET label and ConnectButton */
+    align-items: center; /* Vertically center items */
+    margin-bottom: 32px; /* Space below the header */
+  }
+  
+  /* RESET label styling */
+  .reset-label {
+    font-size: 28px;
+    font-weight: bold;
+    color: #dddde3;
+  }
+  
+  /* ConnectButton styling */
+  .connect-button-container {
+    margin-left: auto;
+  }
+  
