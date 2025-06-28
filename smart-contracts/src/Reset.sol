@@ -35,12 +35,20 @@ contract Reset is Ownable2Step, ReentrancyGuard {
 
     uint256 public fee; // in bps
 
+    enum OfferEventType { New, Accepted, Rejected }
+
     event IncidentRequested(uint256 indexed requestId, address indexed creator);
     event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string indexed protocolName, uint256 hackedAmount, address exploitedAddress, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
 
-    event NewOffer(address indexed incident, uint256 indexed offerId, uint8 indexed proposer, uint256 returnAmount, uint256 validUntil);
-    event OfferAccepted(address indexed incident, string indexed protocolName, uint256 indexed returnedAmount);
-    event OfferRejected(address indexed incident, string indexed protocolName, uint256 returnedAmount, uint8 proposer);
+    event OfferEvent(
+        address indexed incident,
+        uint256 indexed offerId,
+        uint8 indexed proposer,
+        uint256 returnAmount,
+        uint256 validUntil,
+        string protocolName,
+        OfferEventType eventType
+    );
 
     modifier onlyIncident() {
         if (!isIncident[_msgSender()]) {
@@ -50,7 +58,7 @@ contract Reset is Ownable2Step, ReentrancyGuard {
     }
 
     modifier onlyIncidentOrOwner() {
-        if (_msgSender() != owner() && !isIncident[_msgSender()]) {
+        if (tx.origin != owner() && !isIncident[_msgSender()]) {
             revert OnlyIncidentCanCall();
         }
         _;
@@ -131,26 +139,56 @@ contract Reset is Ownable2Step, ReentrancyGuard {
         uint256 _offerId,
         uint8 _proposer,
         uint256 _returnAmount,
-        uint256 _validUntil
+        uint256 _validUntil,
+        string memory _protocolName
     ) external onlyIncidentOrOwner {
-        emit NewOffer(_incident, _offerId, _proposer, _returnAmount, _validUntil);
+        emit OfferEvent(
+            _incident,
+            _offerId,
+            _proposer,
+            _returnAmount,
+            _validUntil,
+            _protocolName,
+            OfferEventType.New
+        );
     }
 
     function emitOfferAccepted(
         address _incident,
-        string memory _protocolName,
-        uint256 _returnedAmount
+        uint256 _offerId,
+        uint8 _proposer,
+        uint256 _returnAmount,
+        uint256 _validUntil,
+        string memory _protocolName
     ) external onlyIncident {
-        emit OfferAccepted(_incident, _protocolName, _returnedAmount);
+        emit OfferEvent(
+            _incident,
+            _offerId,
+            _proposer,
+            _returnAmount,
+            _validUntil,
+            _protocolName,
+            OfferEventType.Accepted
+        );
     }
 
     function emitOfferRejected(
         address _incident,
-        string memory _protocolName,
-        uint256 _returnedAmount,
-        uint8 _proposer
+        uint256 _offerId,
+        uint8 _proposer,
+        uint256 _returnAmount,
+        uint256 _validUntil,
+        string memory _protocolName
     ) external onlyIncident {
-        emit OfferRejected(_incident, _protocolName, _returnedAmount, _proposer);
+        emit OfferEvent(
+            _incident,
+            _offerId,
+            _proposer,
+            _returnAmount,
+            _validUntil,
+            _protocolName,
+            OfferEventType.Rejected
+        );
     }
 
     function getFee() external view returns (uint256) {

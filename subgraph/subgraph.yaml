@@ -8,9 +8,9 @@ dataSources:
     name: Reset
     network: sepolia
     source:
-      address: "0xAf72Cc8F948a09667512AD7A7F141eF2B8623696"
+      address: "0xCA30ba1Fd08fD51b4a262DC2DB27cD1A742918cF"
       abi: Reset
-      startBlock: 8648699
+      startBlock: 8650052
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -18,9 +18,7 @@ dataSources:
       entities:
         - IncidentApproved
         - IncidentRequested
-        - NewOffer
-        - OfferAccepted
-        - OfferRejected
+        - OfferEvent
         - OwnershipTransferStarted
         - OwnershipTransferred
       abis:
@@ -31,12 +29,8 @@ dataSources:
           handler: handleIncidentApproved
         - event: IncidentRequested(indexed uint256,indexed address)
           handler: handleIncidentRequested
-        - event: NewOffer(indexed address,indexed uint256,indexed uint8,uint256,uint256)
-          handler: handleNewOffer
-        - event: OfferAccepted(indexed address,indexed string,indexed uint256)
-          handler: handleOfferAccepted
-        - event: OfferRejected(indexed address,indexed string,uint256,uint8)
-          handler: handleOfferRejected
+        - event: OfferEvent(indexed address,indexed uint256,indexed uint8,uint256,uint256,string,uint8)
+          handler: handleOfferEvent
         - event: OwnershipTransferStarted(indexed address,indexed address)
           handler: handleOwnershipTransferStarted
         - event: OwnershipTransferred(indexed address,indexed address)

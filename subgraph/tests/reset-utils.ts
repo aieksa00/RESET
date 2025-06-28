@@ -3,9 +3,7 @@ import { ethereum, BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
 import {
   IncidentApproved,
   IncidentRequested,
-  NewOffer,
-  OfferAccepted,
-  OfferRejected,
+  OfferEvent,
   OwnershipTransferStarted,
   OwnershipTransferred
 } from "../generated/Reset/Reset"
@@ -105,109 +103,60 @@ export function createIncidentRequestedEvent(
   return incidentRequestedEvent
 }
 
-export function createNewOfferEvent(
+export function createOfferEventEvent(
   incident: Address,
   offerId: BigInt,
   proposer: i32,
   returnAmount: BigInt,
-  validUntil: BigInt
-): NewOffer {
-  let newOfferEvent = changetype<NewOffer>(newMockEvent())
+  validUntil: BigInt,
+  protocolName: string,
+  eventType: i32
+): OfferEvent {
+  let offerEventEvent = changetype<OfferEvent>(newMockEvent())
 
-  newOfferEvent.parameters = new Array()
+  offerEventEvent.parameters = new Array()
 
-  newOfferEvent.parameters.push(
+  offerEventEvent.parameters.push(
     new ethereum.EventParam("incident", ethereum.Value.fromAddress(incident))
   )
-  newOfferEvent.parameters.push(
+  offerEventEvent.parameters.push(
     new ethereum.EventParam(
       "offerId",
       ethereum.Value.fromUnsignedBigInt(offerId)
     )
   )
-  newOfferEvent.parameters.push(
+  offerEventEvent.parameters.push(
     new ethereum.EventParam(
       "proposer",
       ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(proposer))
     )
   )
-  newOfferEvent.parameters.push(
+  offerEventEvent.parameters.push(
     new ethereum.EventParam(
       "returnAmount",
       ethereum.Value.fromUnsignedBigInt(returnAmount)
     )
   )
-  newOfferEvent.parameters.push(
+  offerEventEvent.parameters.push(
     new ethereum.EventParam(
       "validUntil",
       ethereum.Value.fromUnsignedBigInt(validUntil)
     )
   )
-
-  return newOfferEvent
-}
-
-export function createOfferAcceptedEvent(
-  incident: Address,
-  protocolName: string,
-  returnedAmount: BigInt
-): OfferAccepted {
-  let offerAcceptedEvent = changetype<OfferAccepted>(newMockEvent())
-
-  offerAcceptedEvent.parameters = new Array()
-
-  offerAcceptedEvent.parameters.push(
-    new ethereum.EventParam("incident", ethereum.Value.fromAddress(incident))
-  )
-  offerAcceptedEvent.parameters.push(
+  offerEventEvent.parameters.push(
     new ethereum.EventParam(
       "protocolName",
       ethereum.Value.fromString(protocolName)
     )
   )
-  offerAcceptedEvent.parameters.push(
+  offerEventEvent.parameters.push(
     new ethereum.EventParam(
-      "returnedAmount",
-      ethereum.Value.fromUnsignedBigInt(returnedAmount)
+      "eventType",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(eventType))
     )
   )
 
-  return offerAcceptedEvent
-}
-
-export function createOfferRejectedEvent(
-  incident: Address,
-  protocolName: string,
-  returnedAmount: BigInt,
-  proposer: i32
-): OfferRejected {
-  let offerRejectedEvent = changetype<OfferRejected>(newMockEvent())
-
-  offerRejectedEvent.parameters = new Array()
-
-  offerRejectedEvent.parameters.push(
-    new ethereum.EventParam("incident", ethereum.Value.fromAddress(incident))
-  )
-  offerRejectedEvent.parameters.push(
-    new ethereum.EventParam(
-      "protocolName",
-      ethereum.Value.fromString(protocolName)
-    )
-  )
-  offerRejectedEvent.parameters.push(
-    new ethereum.EventParam(
-      "returnedAmount",
-      ethereum.Value.fromUnsignedBigInt(returnedAmount)
-    )
-  )
-  offerRejectedEvent.parameters.push(
-    new ethereum.EventParam(
-      "proposer",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(proposer))
-    )
-  )
-
-  return offerRejectedEvent
+  return offerEventEvent
 }
 
 export function createOwnershipTransferStartedEvent(

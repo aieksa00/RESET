@@ -1,21 +1,18 @@
 import {
   IncidentApproved as IncidentApprovedEvent,
   IncidentRequested as IncidentRequestedEvent,
-  NewOffer as NewOfferEvent,
-  OfferAccepted as OfferAcceptedEvent,
-  OfferRejected as OfferRejectedEvent,
+  OfferEvent as OfferEventEvent,
   OwnershipTransferStarted as OwnershipTransferStartedEvent,
   OwnershipTransferred as OwnershipTransferredEvent
 } from "../generated/Reset/Reset"
 import {
   IncidentApproved,
   IncidentRequested,
-  NewOffer,
-  OfferAccepted,
-  OfferRejected,
+  OfferEvent,
   OwnershipTransferStarted,
   OwnershipTransferred
 } from "../generated/schema"
+import { Bytes } from "@graphprotocol/graph-ts";
 
 export function handleIncidentApproved(event: IncidentApprovedEvent): void {
   let entity = new IncidentApproved(
@@ -53,46 +50,19 @@ export function handleIncidentRequested(event: IncidentRequestedEvent): void {
   entity.save()
 }
 
-export function handleNewOffer(event: NewOfferEvent): void {
-  let entity = new NewOffer(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
+export function handleOfferEvent(event: OfferEventEvent): void {
+  //let entity = new OfferEvent(
+  //  event.transaction.hash.concatI32(event.logIndex.toI32())
+  //)
+  let id = event.params.incident.toHex() + "-" + event.params.offerId.toString();
+  let entity = new OfferEvent(Bytes.fromUTF8(id));
   entity.incident = event.params.incident
   entity.offerId = event.params.offerId
   entity.proposer = event.params.proposer
   entity.returnAmount = event.params.returnAmount
   entity.validUntil = event.params.validUntil
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleOfferAccepted(event: OfferAcceptedEvent): void {
-  let entity = new OfferAccepted(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.incident = event.params.incident
   entity.protocolName = event.params.protocolName
-  entity.returnedAmount = event.params.returnedAmount
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleOfferRejected(event: OfferRejectedEvent): void {
-  let entity = new OfferRejected(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.incident = event.params.incident
-  entity.protocolName = event.params.protocolName
-  entity.returnedAmount = event.params.returnedAmount
-  entity.proposer = event.params.proposer
+  entity.eventType = event.params.eventType
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
