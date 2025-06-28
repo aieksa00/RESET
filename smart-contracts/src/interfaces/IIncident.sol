@@ -7,4 +7,6 @@ interface IIncident {
     function acceptOffer(uint256 _offerId) external;
 
     function RejectOffer(uint256 _offerId) external;
+
+    function getHackerAddress() external view returns (address);
 }
