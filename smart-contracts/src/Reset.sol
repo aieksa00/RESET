@@ -39,7 +39,7 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     enum OfferEventType { New, Accepted, Rejected }
 
     event IncidentRequested(uint256 indexed requestId, address indexed creator);
-    event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string indexed protocolName, uint256 hackedAmount, address exploitedAddress, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
+    event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string protocolName, uint256 hackedAmount, address exploitedAddress, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
 
     event OfferEvent(
         address indexed incident,
