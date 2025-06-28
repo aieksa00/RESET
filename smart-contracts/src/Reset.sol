@@ -50,7 +50,7 @@ contract Reset is Ownable2Step, ReentrancyGuard {
     }
 
     modifier onlyIncidentOrOwner() {
-        if (_msgSender() != owner() && !isIncident[_msgSender()]) {
+        if (tx.origin != owner() && !isIncident[_msgSender()]) {
             revert OnlyIncidentCanCall();
         }
         _;
