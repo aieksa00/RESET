@@ -3,22 +3,7 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
-
-interface IReset {
-    function emitNewOffer(
-        address incident,
-        uint256 offerId,
-        Incident.Proposer proposer,
-        uint256 returnAmount,
-        uint256 validUntil
-    ) external;
-
-    function emitOfferAccepted(
-        address incident,
-        string memory protocolName,
-        uint256 returnedAmount
-    ) external;
-}
+import "./interfaces/IReset.sol";
 
 contract Incident is Ownable {
     using SafeERC20 for IERC20;
@@ -121,7 +106,7 @@ contract Incident is Ownable {
         IReset(reset).emitNewOffer(
             address(this),
             offersCount,
-            _proposer,
+            uint8(_proposer),
             _returnAmount,
             _validUntil
         );
