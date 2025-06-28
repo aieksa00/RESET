@@ -3,11 +3,11 @@ export interface HackDto {
   requestId: string; // Request ID
   incidentAddress: string; // Address of the incident
   protocolName: string; // Name of the protocol
-  hackedAmount: string; // Amount hacked (in wei)
+  hackedAmount: bigint; // Amount hacked (in wei)
   exploitedAddress: string; // Address exploited by the hacker
   hackerAddress: string; // Address of the hacker
   txHash: string; // Transaction hash
-  initialOfferAmount: string; // Initial offer amount (in wei)
+  initialOfferAmount: bigint; // Initial offer amount (in wei)
   initialOfferValidity: number; // Validity timestamp (UNIX time)
   creator: string; // Address of the creator
 }

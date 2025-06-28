@@ -1,6 +1,6 @@
 export const ResetContractAddress = {
-    sepoliaAddress: process.env.REACT_APP_RESET_SEPOLIA_ADDRESS || '',
+    sepoliaAddress: '0xCA30ba1Fd08fD51b4a262DC2DB27cD1A742918cF',
 };
 
-export const GraphQueryAPIKey = process.env.REACT_APP_GRAPH_QUERY_API_KEY || '';
-export const GraphQueryUrl = process.env.REACT_APP_GRAPH_QUERY_URL || '';
+export const GraphQueryAPIKey = '9f0f0cd72bc02f28154f9c0b2756a828';
+export const GraphQueryUrl = 'https://api.studio.thegraph.com/query/81943/reset/version/latest';
