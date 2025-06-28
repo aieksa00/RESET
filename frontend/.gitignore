@@ -30,3 +30,7 @@ coverage/
 
 # Nx-specific files
 .nx/
+
+# Vite and Vitest
+vite.config.*.timestamp*
+vitest.config.*.timestamp*

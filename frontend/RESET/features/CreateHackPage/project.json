@@ -1,0 +1,9 @@
+{
+  "name": "CreateHackPage",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "RESET/features/CreateHackPage/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project CreateHackPage --web",
+  "targets": {}
+}

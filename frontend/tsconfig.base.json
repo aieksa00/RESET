@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "CreateHackPage": ["RESET/features/CreateHackPage/src/index.ts"],
+      "HackDetailsPage": ["RESET/features/HackDetailsPage/src/index.ts"],
+      "HacksPage": ["RESET/features/HacksPage/src/index.ts"],
+      "LandingPage": ["RESET/features/LandingPage/src/index.ts"],
+      "SCService": ["RESET/sc-service/src/index.ts"],
+      "models": ["RESET/models/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
