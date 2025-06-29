@@ -5,62 +5,37 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Reset
+    name: EventEmitter
     network: sepolia
     source:
-      address: "0xFd0094Dc05B6f93e3Dcb08Ef794d2fcAdcCE5C07"
-      abi: Reset
-      startBlock: 8656372
+      address: "0xd1D3f68e01044786baa75B4b7e19a2d878162be1"
+      abi: EventEmitter
+      startBlock: 8657491
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
-        - IncidentApproved
+        - IncidentEvent
         - IncidentRequested
-        - OfferEvent
-        - OwnershipTransferStarted
-        - OwnershipTransferred
-      abis:
-        - name: Reset
-          file: ./abis/Reset.json
-      eventHandlers:
-        - event: IncidentApproved(indexed uint256,indexed
-            address,string,uint256,address,address,bytes32,uint256,uint256,address)
-          handler: handleIncidentApproved
-        - event: IncidentRequested(indexed uint256,indexed address)
-          handler: handleIncidentRequested
-        - event: OfferEvent(indexed address,indexed uint256,indexed
-            uint8,uint256,uint256,string,uint8)
-          handler: handleOfferEvent
-        - event: OwnershipTransferStarted(indexed address,indexed address)
-          handler: handleOwnershipTransferStarted
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/reset.ts
-  - kind: ethereum
-    name: Mailbox
-    network: sepolia
-    source:
-      address: "0xd0df86242833cfDe00acd60Ae419f11C919E1611"
-      abi: Mailbox
-      startBlock: 8656372
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.9
-      language: wasm/assemblyscript
-      entities:
+        - MailboxPublicKeyRegistered
         - MessageSent
-        - PublicKeyRegistered
+        - OfferEvent
         - SignedContractEvent
       abis:
-        - name: Mailbox
-          file: ./abis/Mailbox.json
+        - name: EventEmitter
+          file: ./abis/EventEmitter.json
       eventHandlers:
+        - event: IncidentEvent(indexed uint256,indexed address,string,uint256,address,address,bytes32,uint256,uint256,address,uint8)
+          handler: handleIncidentEvent
+        - event: IncidentRequested(indexed uint256,indexed address)
+          handler: handleIncidentRequested
+        - event: MailboxPublicKeyRegistered(indexed address,bytes)
+          handler: handleMailboxPublicKeyRegistered
         - event: MessageSent(indexed address,indexed address,indexed address,bytes)
           handler: handleMessageSent
-        - event: PublicKeyRegistered(indexed address,bytes)
-          handler: handlePublicKeyRegistered
+        - event: OfferEvent(indexed address,indexed uint256,indexed uint8,uint256,uint256,string,uint8)
+          handler: handleOfferEvent
         - event: SignedContractEvent(indexed address,indexed address,indexed address,bytes)
           handler: handleSignedContractEvent
-      file: ./src/mailbox.ts
+      file: ./src/event-emitter.ts

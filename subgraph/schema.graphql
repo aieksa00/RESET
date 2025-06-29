@@ -1,4 +1,4 @@
-type IncidentApproved @entity(immutable: true) {
+type IncidentEvent @entity(immutable: true) {
   id: Bytes!
   requestId: BigInt! # uint256
   incidentAddress: Bytes! # address
@@ -10,6 +10,7 @@ type IncidentApproved @entity(immutable: true) {
   initialOfferAmount: BigInt! # uint256
   initialOfferValidity: BigInt! # uint256
   creator: Bytes! # address
+  status: Int! # uint8
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -24,37 +25,15 @@ type IncidentRequested @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type OfferEvent @entity(immutable: true) {
+type MailboxPublicKeyRegistered @entity(immutable: true) {
   id: Bytes!
-  incident: Bytes! # address
-  offerId: BigInt! # uint256
-  proposer: Int! # uint8
-  returnAmount: BigInt! # uint256
-  validUntil: BigInt! # uint256
-  protocolName: String! # string
-  eventType: Int! # uint8
+  user: Bytes! # address
+  publicKey: Bytes! # bytes
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type OwnershipTransferStarted @entity(immutable: true) {
-  id: Bytes!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OwnershipTransferred @entity(immutable: true) {
-  id: Bytes!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
 type MessageSent @entity(immutable: true) {
   id: Bytes!
   incidentAddress: Bytes! # address
@@ -66,10 +45,15 @@ type MessageSent @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type PublicKeyRegistered @entity(immutable: true) {
+type OfferEvent @entity(immutable: true) {
   id: Bytes!
-  user: Bytes! # address
-  publicKey: Bytes! # bytes
+  incident: Bytes! # address
+  offerId: BigInt! # uint256
+  proposer: Int! # uint8
+  returnAmount: BigInt! # uint256
+  validUntil: BigInt! # uint256
+  protocolName: String! # string
+  eventType: Int! # uint8
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
