@@ -1,13 +1,13 @@
 {
-  "name": "reset-subgraph",
+  "name": "reset",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ reset-subgraph",
-    "create-local": "graph create --node http://localhost:8020/ reset-subgraph",
-    "remove-local": "graph remove --node http://localhost:8020/ reset-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 reset-subgraph",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ reset",
+    "create-local": "graph create --node http://localhost:8020/ reset",
+    "remove-local": "graph remove --node http://localhost:8020/ reset",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 reset",
     "test": "graph test"
   },
   "dependencies": {
