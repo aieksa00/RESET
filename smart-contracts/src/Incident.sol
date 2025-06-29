@@ -42,6 +42,7 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         OfferStatus offerStatus;
     }
 
+    uint256 public incidentId;
     string public protocolName;
     address public exploitedAddress;
     uint256 public hackedAmount;
@@ -80,7 +81,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         uint256 _initialOfferAmount,
         uint256 _initialOfferValidity,
         address _owner,
-        address _weth
+        address _weth,
+        uint256 _incidentId
     ) Ownable(_owner) {
         protocolName = _protocolName;
         exploitedAddress = _exploitedAddress;
@@ -90,6 +92,21 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         status = Status.Active;
         weth = IERC20(_weth);
         reset = _msgSender();
+        incidentId = _incidentId;
+
+        address mailbox = IReset(reset).getMailbox();
+        bytes memory contractData = abi.encodePacked(
+            "Protocol agrees not to take any legal action against the hacker if the incident is resolved and they found common ground."
+        );
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, ) = mailbox.call(
+            abi.encodeWithSignature(
+                "signContract(uint256,bytes)",
+                _incidentId,
+                contractData
+            )
+        );
+        require(success, "Mailbox signContract failed");
 
         _newOffer(Proposer.Protocol, _initialOfferAmount, _initialOfferValidity);
     }

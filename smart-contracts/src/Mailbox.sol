@@ -26,8 +26,28 @@ contract Mailbox {
     }
     mapping(uint256 => Message[]) private incidentMessages; // incidentId => messages
 
+    struct SignedContract {
+        address protocolRepresentative; // creator of the incident (protocol representative)
+        address hacker;
+        bytes contractData;
+        uint256 timestamp;
+    }
+    mapping(uint256 => SignedContract) private incidentSignedContracts; // incidentId => signed contract
+
     event PublicKeyRegistered(address indexed user, bytes publicKey);
     event MessageSent(uint256 indexed incidentId, address indexed from, address indexed to, bytes encryptedMessage);
+    event SignedContract(uint256 indexed incidentId, address indexed creator, address indexed hacker, bytes contractData);
+
+    modifier onlyIncident(uint256 _incidentId) {
+        address incidentAddr = reset.getIncident(_incidentId);
+        if (incidentAddr == address(0)) {
+            revert IncidentDoesNotExist();
+        }
+        if (msg.sender != incidentAddr) {
+            revert NotAuthorized();
+        }
+        _;
+    }
 
     constructor(address _reset) {
         reset = IReset(_reset);
@@ -51,6 +71,23 @@ contract Mailbox {
 
         creator = IOwnable(incidentAddr).owner();
         hacker = IIncident(incidentAddr).getHackerAddress();
+    }
+
+    function signContract(uint256 _incidentId, bytes calldata _contractData) external onlyIncident(_incidentId) {
+        (address creator, address hacker) = getIncidentParticipants(_incidentId);
+
+        incidentSignedContracts[_incidentId] = SignedContract({
+            creator: creator,
+            hacker: hacker,
+            contractData: _contractData,
+            timestamp: block.timestamp
+        });
+        
+        emit SignedContract(_incidentId, creator, hacker, _contractData);
+    }
+
+    function getSignedContract(uint256 _incidentId) external view returns (SignedContract memory) {
+        return incidentSignedContracts[_incidentId];
     }
 
     function sendMessage(uint256 _incidentId, address _to, bytes calldata _encryptedMessage) external {
@@ -80,4 +117,8 @@ contract Mailbox {
     function getPublicKey(address _user) external view returns (bytes memory) {
         return publicKeys[_user];
     }
+    
+    receive() external payable {}
+
+    fallback() external payable {}
 }

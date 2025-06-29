@@ -2,6 +2,8 @@
 pragma solidity ^0.8.24;
 
 interface IReset {
+    function getMailbox() external view returns (address);
+
     function requestIncident(
         string memory _protocolName,
         address _exploitedAddress,
