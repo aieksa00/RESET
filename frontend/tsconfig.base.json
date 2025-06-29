@@ -21,7 +21,8 @@
       "HacksPage": ["RESET/features/HacksPage/src/index.ts"],
       "LandingPage": ["RESET/features/LandingPage/src/index.ts"],
       "SCService": ["RESET/sc-service/src/index.ts"],
-      "models": ["RESET/models/src/index.ts"]
+      "models": ["RESET/models/src/index.ts"],
+      "@providers": ["libs/providers/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

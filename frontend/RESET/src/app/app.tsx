@@ -8,6 +8,7 @@ import { HacksPage } from 'HacksPage';
 import { CreateHackPage } from 'CreateHackPage';
 import { HackDetailsPage } from 'HackDetailsPage';
 import { ChatWindow } from 'ChatWindow';
+import { ChatWindowProvider, useChatWindows } from '@providers';
 
 import '@rainbow-me/rainbowkit/styles.css';
 import { ConnectButton, getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
@@ -30,43 +31,53 @@ const queryClient = new QueryClient({
   },
 });
 
-export function App() {
+// Create a separate component for the app content
+function AppContent() {
   const location = useLocation();
   const isFullPageRoute = location.pathname === RESETRoutes.Landing;
+  const { chatWindows } = useChatWindows(); // Now this is safe to use
 
+  return (
+    <div>
+      {isFullPageRoute ? (
+        <Routes>
+          <Route path={RESETRoutes.Landing} element={<LandingPage />} />
+        </Routes>
+      ) : (
+        <div className={styles['app-layout']}>
+          <div className={styles['sidebar']}></div>
+
+          <div className={styles['routes']}>
+            <div className={styles['header']}>
+              <span className={styles['reset-label']}>RESET</span>
+              <div className={styles['connect-button-container']}>
+                <ConnectButton />
+              </div>
+            </div>
+            <Routes>
+              <Route path={RESETRoutes.Hacks} element={<HacksPage />} />
+              <Route path={RESETRoutes.ReportHack} element={<CreateHackPage />} />
+              <Route path={RESETRoutes.HackDetails} element={<HackDetailsPage />} />
+            </Routes>
+          </div>
+
+          {Array.from(chatWindows.entries()).map(([id, window]) => (
+            <ChatWindow key={id} id={id} title={`Chat - ${id}`} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function App() {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          {isFullPageRoute ? (
-            // Render LandingPage as a full-page route
-            <Routes>
-              <Route path={RESETRoutes.Landing} element={<LandingPage />} />
-            </Routes>
-          ) : (
-            // Render the layout for other routes
-            <div className={styles['app-layout']}>
-              {/* Left Sidebar */}
-              <div className={styles['sidebar']}></div>
-
-              {/* Middle Routes */}
-              <div className={styles['routes']}>
-                <div className={styles['header']}>
-                  <span className={styles['reset-label']}>RESET</span>
-                  <div className={styles['connect-button-container']}>
-                    <ConnectButton />
-                  </div>
-                </div>
-                <Routes>
-                  <Route path={RESETRoutes.Hacks} element={<HacksPage />} />
-                  <Route path={RESETRoutes.ReportHack} element={<CreateHackPage />} />
-                  <Route path={RESETRoutes.HackDetails} element={<HackDetailsPage />} />
-                </Routes>
-              </div>
-              {/* Right Sidebar */}
-              <ChatWindow />
-            </div>
-          )}
+          <ChatWindowProvider>
+            <AppContent />
+          </ChatWindowProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

@@ -15,12 +15,7 @@ export function HacksPage() {
   const { data, status } = useQuery({
     queryKey: ['data'],
     async queryFn(): Promise<{ incidentApproveds: HackDto[] }> {
-      return await request(
-        GraphQueryUrl,
-        HacksQuery,
-        {},
-        { Authorization: `Bearer ${GraphQueryAPIKey}` }
-      );
+      return await request(GraphQueryUrl, HacksQuery, {}, { Authorization: `Bearer ${GraphQueryAPIKey}` });
     },
   });
 
@@ -30,9 +25,8 @@ export function HacksPage() {
       setHacks(data.incidentApproveds || []);
       setFilteredHacks(data.incidentApproveds || []);
     }
+    console.log('GraphQL Data:', data);
   }, [data, status]);
-
-  console.log('GraphQL Data:', data);
 
   const {
     register,
@@ -46,21 +40,15 @@ export function HacksPage() {
 
   const onSubmit = (data: { searchTerm: string }) => {
     const term = data.searchTerm.toLowerCase();
-    const filtered = hacks.filter((hack) =>
-      hack.protocolName.toLowerCase().includes(term)
-    );
+    const filtered = hacks.filter((hack) => hack.protocolName.toLowerCase().includes(term));
     setFilteredHacks(filtered);
     console.log(`Searching for: ${data.searchTerm}`);
   };
 
   return (
-    <div className={styles['container']}>
+    <>
       <form onSubmit={handleSubmit(onSubmit)} className={styles['form']}>
-        <div
-          className={`${styles['input-container']} ${
-            errors.searchTerm ? styles['error-border'] : ''
-          }`}
-        >
+        <div className={`${styles['input-container']} ${errors.searchTerm ? styles['error-border'] : ''}`}>
           <input
             type="text"
             id="searchTerm"
@@ -74,11 +62,7 @@ export function HacksPage() {
             })}
             className={styles['search-bar']}
           />
-          {errors.searchTerm && (
-            <p className={styles['error-message']}>
-              {errors.searchTerm.message}
-            </p>
-          )}
+          {errors.searchTerm && <p className={styles['error-message']}>{errors.searchTerm.message}</p>}
         </div>
         <button type="submit" className={styles['search-button']}>
           Search
@@ -89,7 +73,7 @@ export function HacksPage() {
           <HackCard key={index} hack={hack} />
         ))}
       </div>
-    </div>
+    </>
   );
 }
 

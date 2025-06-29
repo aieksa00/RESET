@@ -5,11 +5,14 @@ import { HackDto, RESETRoutes } from 'models';
 import { useAccount } from 'wagmi';
 import { shortenAddress } from '../HacksService/HacksService';
 import { useNavigate } from 'react-router-dom';
+import { useChatWindows } from '@providers';
+
 
 export function HackCard({ hack }: { hack: HackDto }) {
   const [canSendMessage, setCanSendMessage] = useState<boolean>(false);
 
-  const { address } = useAccount(); // Get wallet address and connection status
+  const { address } = useAccount();
+  const { openChat } = useChatWindows();
 
   const navigation = useNavigate();
 
@@ -33,7 +36,7 @@ export function HackCard({ hack }: { hack: HackDto }) {
   };
 
   const handleSendMessage = () => {
-    console.log('Sending message...');
+    openChat(hack.id);
   };
 
   return (
