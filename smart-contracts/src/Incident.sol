@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IReset.sol";
+import "./interfaces/IEventEmitter.sol";
 
 contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -58,6 +59,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
 
     address public reset;
 
+    IEventEmitter public eventEmitter;
+
     modifier onlyHackerOrOwner() {
         if (_msgSender() != hackerAddress && _msgSender() != owner()) {
             revert OnlyHackerOrOwner();
@@ -82,7 +85,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         uint256 _initialOfferValidity,
         address _owner,
         address _weth,
-        uint256 _incidentId
+        uint256 _incidentId,
+        address _eventEmitter
     ) Ownable(_owner) {
         protocolName = _protocolName;
         exploitedAddress = _exploitedAddress;
@@ -93,6 +97,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         weth = IERC20(_weth);
         reset = _msgSender();
         incidentId = _incidentId;
+
+        eventEmitter = IEventEmitter(_eventEmitter);
 
         address mailbox = IReset(reset).getMailbox();
         bytes memory contractData = abi.encodePacked(
@@ -133,7 +139,7 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             weth.forceApprove(address(this), _returnAmount);
         }
 
-        IReset(reset).emitNewOffer(
+        eventEmitter.emitNewOffer(
             address(this),
             offersCount,
             uint8(_proposer),
@@ -174,13 +180,29 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             _acceptOfferProtocol(offer);
         }
 
-        IReset(reset).emitOfferAccepted(
+        Offer storage initialOffer = offers[0];
+
+        eventEmitter.emitOfferAccepted(
             address(this),
             _offerId,
             uint8(offer.proposer),
             offer.returnAmount,
             offer.validUntil,
             protocolName
+        );
+
+        eventEmitter.emitIncidentEvent(
+            incidentId,
+            address(this),
+            protocolName,
+            hackedAmount,
+            exploitedAddress,
+            hackerAddress,
+            transactionHash,
+            initialOffer.returnAmount,
+            initialOffer.validUntil,
+            owner(),
+            uint8(status)
         );
     }
 
@@ -235,7 +257,7 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             _rejectOfferProtocol(offer);
         }
 
-        IReset(reset).emitOfferRejected(
+        eventEmitter.emitOfferRejected(
             address(this),
             _offerId,
             uint8(offer.proposer),
@@ -255,6 +277,10 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
 
     function getHackerAddress() external view returns (address) {
         return hackerAddress;
+    }
+
+    function getStatus() external view returns (uint8) {
+        return uint8(status);
     }
 
     receive() external payable {}
