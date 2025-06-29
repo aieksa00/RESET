@@ -36,7 +36,7 @@ contract Mailbox {
 
     event PublicKeyRegistered(address indexed user, bytes publicKey);
     event MessageSent(uint256 indexed incidentId, address indexed from, address indexed to, bytes encryptedMessage);
-    event SignedContract(uint256 indexed incidentId, address indexed creator, address indexed hacker, bytes contractData);
+    event SignedContractEvent(uint256 indexed incidentId, address indexed creator, address indexed hacker, bytes contractData);
 
     modifier onlyIncident(uint256 _incidentId) {
         address incidentAddr = reset.getIncident(_incidentId);
@@ -77,13 +77,13 @@ contract Mailbox {
         (address creator, address hacker) = getIncidentParticipants(_incidentId);
 
         incidentSignedContracts[_incidentId] = SignedContract({
-            creator: creator,
+            protocolRepresentative: creator,
             hacker: hacker,
             contractData: _contractData,
             timestamp: block.timestamp
         });
         
-        emit SignedContract(_incidentId, creator, hacker, _contractData);
+        emit SignedContractEvent(_incidentId, creator, hacker, _contractData);
     }
 
     function getSignedContract(uint256 _incidentId) external view returns (SignedContract memory) {

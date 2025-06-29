@@ -260,4 +260,6 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
     receive() external payable {}
 
     fallback() external payable {}
+
+    function renounceOwnership() public override onlyOwner {}
 }

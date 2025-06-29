@@ -14,6 +14,8 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     error IncidentAlreadyApproved();
     error OnlyIncidentCanCall();
     error cantOfferMoreThanHackedAmount();
+    error CantBeZero();
+    error MailboxAlreadySet();
 
     struct IncidentRequest {
         string protocolName;
@@ -66,10 +68,21 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
         _;
     }
 
-    constructor(address _weth, address _mailbox, uint256 _fee) Ownable(_msgSender()) {
+    constructor(address _weth, uint256 _fee) Ownable(_msgSender()) {
         weth = _weth;
-        mailbox = _mailbox;
         fee = _fee;
+    }
+
+    function setMailbox(address _mailbox) external onlyOwner {
+        if (mailbox != address(0)) {
+            revert MailboxAlreadySet();
+        }
+
+        if (_mailbox == address(0)) {
+            revert CantBeZero();
+        }
+
+        mailbox = _mailbox;
     }
 
     function getMailbox() external view returns (address) {
@@ -128,7 +141,8 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
             incidentRequest.initialOfferAmount,
             incidentRequest.initialOfferValidity,
             incidentRequest.creator,
-            weth
+            weth,
+            incidentRequestCount
         );
 
         incidents.push(address(incident));
@@ -218,4 +232,5 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
 
     fallback() external payable {}
 
+    function renounceOwnership() public override onlyOwner {}
 }

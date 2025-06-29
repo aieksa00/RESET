@@ -2,6 +2,8 @@
 pragma solidity ^0.8.24;
 
 interface IReset {
+    function setMailbox(address _mailbox) external;
+
     function getMailbox() external view returns (address);
 
     function requestIncident(
