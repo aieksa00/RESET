@@ -19,7 +19,7 @@ export function OfferQuery(incident: string): string {
 
 export const HacksQuery = gql`
   {
-    incidentApproveds {
+    incidentEvents {
       id
       requestId
       incidentAddress
@@ -31,6 +31,7 @@ export const HacksQuery = gql`
       initialOfferAmount
       initialOfferValidity
       creator
+      status
     }
   }
 `;

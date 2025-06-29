@@ -15,16 +15,24 @@
 }
 
 .status-label {
-  position: absolute; /* Position relative to the card */
-  top: 16px; /* Distance from the top of the card */
-  right: 16px; /* Distance from the right of the card */
-  background-color: #6e00db; /* Background color for the label */
-  color: #dddde3; /* Text color */
-  padding: 4px 8px; /* Padding for the label */
-  border-radius: 4px; /* Rounded corners */
-  font-size: 12px; /* Font size for the label */
-  font-weight: bold; /* Bold text */
-  width: fit-content; /* Adjust width to content */
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.active {
+  background-color: #6e00db;
+  color: #dddde3;
+}
+
+.resolved {
+  background-color: #4CAF50;
+  color: #ffffff;
 }
 
 .hack-item {

@@ -10,6 +10,7 @@ export interface HackDto {
   initialOfferAmount: bigint; // Initial offer amount (in wei)
   initialOfferValidity: number; // Validity timestamp (UNIX time)
   creator: string; // Address of the creator
+  status: number;
 }
 
 export interface RequestHackDto {
