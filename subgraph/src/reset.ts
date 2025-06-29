@@ -1,4 +1,3 @@
-import { Bytes } from "@graphprotocol/graph-ts"
 import {
   IncidentApproved as IncidentApprovedEvent,
   IncidentRequested as IncidentRequestedEvent,
@@ -51,11 +50,9 @@ export function handleIncidentRequested(event: IncidentRequestedEvent): void {
 }
 
 export function handleOfferEvent(event: OfferEventEvent): void {
-  //let entity = new OfferEvent(
-  //  event.transaction.hash.concatI32(event.logIndex.toI32())
-  //)
-  let id = event.params.incident.toHex() + "-" + event.params.offerId.toString();
-  let entity = new OfferEvent(Bytes.fromUTF8(id));
+  let entity = new OfferEvent(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
   entity.incident = event.params.incident
   entity.offerId = event.params.offerId
   entity.proposer = event.params.proposer

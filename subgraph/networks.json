@@ -1,8 +1,8 @@
 {
   "sepolia": {
     "Reset": {
-      "address": "0x6EA36fBCF49B73D604aC3E5ad2eE7a0D0820CE64",
-      "startBlock": 8650432
+      "address": "0xb2AA896442339e0F7487ab43893d0A1197cc8355",
+      "startBlock": 8656234
     }
   }
 }

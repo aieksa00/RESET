@@ -7,8 +7,10 @@
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
+  { "inputs": [], "name": "CantBeZero", "type": "error" },
   { "inputs": [], "name": "IncidentAlreadyApproved", "type": "error" },
   { "inputs": [], "name": "IncidentDoesNotExist", "type": "error" },
+  { "inputs": [], "name": "MailboxAlreadySet", "type": "error" },
   { "inputs": [], "name": "OnlyIncidentCanCall", "type": "error" },
   {
     "inputs": [
@@ -289,6 +291,22 @@
     "type": "function"
   },
   {
+    "inputs": [
+      { "internalType": "uint256", "name": "_incidentId", "type": "uint256" }
+    ],
+    "name": "getIncident",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getMailbox",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "incidentRequestCount",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -340,6 +358,13 @@
   },
   {
     "inputs": [],
+    "name": "mailbox",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "owner",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
@@ -386,6 +411,15 @@
       }
     ],
     "name": "requestIncident",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_mailbox", "type": "address" }
+    ],
+    "name": "setMailbox",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
