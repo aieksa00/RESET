@@ -33,6 +33,7 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     mapping(address => bool) public isIncident;
 
     address public weth;
+    address public mailbox;
 
     uint256 public fee; // in bps
 
@@ -65,9 +66,14 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
         _;
     }
 
-    constructor(address _weth, uint256 _fee) Ownable(_msgSender()) {
+    constructor(address _weth, address _mailbox, uint256 _fee) Ownable(_msgSender()) {
         weth = _weth;
+        mailbox = _mailbox;
         fee = _fee;
+    }
+
+    function getMailbox() external view returns (address) {
+        return mailbox;
     }
 
     function requestIncident(
