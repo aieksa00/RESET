@@ -206,3 +206,75 @@ async function CheckMetaMask(): Promise<boolean> {
     return false;
   }
 }
+
+
+export async function RejectOffer(incidentAddress: string, offerId: number): Promise<boolean> {
+  // Check if MetaMask is installed and connected
+  const isMetaMaskConnected = await CheckMetaMask();
+  if (!isMetaMaskConnected) {
+    return false;
+  }
+
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  const signer = await provider.getSigner();
+
+  const incidentContract = new ethers.Contract(
+    incidentAddress,
+    incidentAbi,
+    signer
+  );
+
+  try {
+    const tx = await incidentContract.RejectOffer(
+      offerId
+    );
+
+    Swal.fire({
+      title: 'Processing Transaction',
+      text: 'Please wait while your transaction is being processed...',
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      willOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const receipt = await provider.waitForTransaction(tx.hash);
+    
+    Swal.close();
+
+    await Swal.fire({
+      icon: 'success',
+      title: 'Offer Requested',
+      html: `Successfully rejected the offer.<br>
+            <a href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank" rel="noopener noreferrer">Click here to open transation in explorer...</a>`,
+      customClass: {
+        confirmButton: styles['swal-ok-button'],
+      },
+    });
+
+    return true;
+  } catch (error: any) {
+    console.error('Transaction error:', error);
+    if (isError(error, 'ACTION_REJECTED')) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Transaction Cancelled',
+        text: 'You have cancelled the transaction.',
+        customClass: {
+          confirmButton: styles['swal-ok-button'],
+        },
+      });
+    } else {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Transaction Error',
+        text: 'An error occurred while processing the transaction.\nPlease try again later.',
+        customClass: {
+          confirmButton: styles['swal-ok-button'],
+        },
+      });
+    }
+    return false;
+  }
+}

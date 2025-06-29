@@ -80,9 +80,10 @@ export function CreateHackPage() {
           </div>
 
           <div className={styles['form-group']}>
-            <label htmlFor="hackedAmount">Hacked Amount</label>
+            <label htmlFor="hackedAmount">Hacked Amount (WETH)</label>
             <input
               type="number"
+              step="any"
               id="hackedAmount"
               {...register('hackedAmount', { required: 'Hacked Amount is required.' })}
             />
@@ -90,9 +91,10 @@ export function CreateHackPage() {
           </div>
 
           <div className={styles['form-group']}>
-            <label htmlFor="initialOfferAmount">Initial Return Amount</label>
+            <label htmlFor="initialOfferAmount">Initial Return Amount (WETH)</label>
             <input
               type="number"
+              step="any"
               id="initialOfferAmount"
               {...register('initialOfferAmount', { required: 'Return Amount is required.' })}
             />

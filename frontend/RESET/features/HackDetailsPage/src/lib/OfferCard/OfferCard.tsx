@@ -1,6 +1,7 @@
 import styles from './OfferCard.module.css';
 import { OfferDto } from 'models';
 import { formatEther } from 'ethers';
+import { RejectOffer } from 'SCService';
 
 export function OfferCard({ offer }: { offer: OfferDto }) {
 
@@ -11,7 +12,7 @@ export function OfferCard({ offer }: { offer: OfferDto }) {
 
   const handlerejectOffer = () => {
     console.log(`Rejecting offer with ID: ${offer.id}`);
-    // Logic to reject the offer
+    RejectOffer(offer.incident, offer.offerId);
   };
 
   return (
@@ -19,7 +20,7 @@ export function OfferCard({ offer }: { offer: OfferDto }) {
       <h3 className={styles['offer-title']}>{offer.proposer === 1 ? 'Protocol Offer' : 'Hacker Offer'}</h3>
       <div className={styles['offer-item']}>
         <span className={styles['label']}>Return Amount:</span>
-        <span className={styles['value']}>{formatEther(offer.returnAmount)} ETH</span>
+        <span className={styles['value']}>{formatEther(offer.returnAmount)} WETH</span>
       </div>
       <div className={styles['offer-item']}>
         <span className={styles['label']}>Valid Until:</span>

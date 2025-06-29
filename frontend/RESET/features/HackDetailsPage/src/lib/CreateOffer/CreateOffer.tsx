@@ -31,10 +31,11 @@ export function CreateOffer({
       <form onSubmit={handleSubmit(onSubmit)} className={styles['form']}>
         <div className={styles['form-group']}>
           <label htmlFor="amount" className={styles['label']}>
-            Amount (ETH):
+            Amount (WETH):
           </label>
           <input
             type="number"
+            step="any"
             id="amount"
             {...register('amount', {
               required: 'Amount is required',

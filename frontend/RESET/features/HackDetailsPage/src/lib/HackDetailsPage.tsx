@@ -8,7 +8,6 @@ import { formatEther, getAddress } from 'ethers';
 import { request } from 'graphql-request';
 
 import { GraphQueryAPIKey, GraphQueryUrl, HackDto, OfferDto, OfferQuery } from 'models';
-import { decodeProtocolName } from 'HacksPage';
 import CreateOffer from './CreateOffer/CreateOffer';
 import OfferCard from './OfferCard/OfferCard';
 
@@ -53,7 +52,7 @@ export function HackDetailsPage() {
           <h2>Hack Details</h2>
           <div className={styles['hack-item']}>
             <span className={styles['label']}>Protocol Name:</span>
-            <span className={styles['value']}>{decodeProtocolName(hack.protocolName)}</span>
+            <span className={styles['value']}>{hack.protocolName}</span>
           </div>
           <div className={styles['hack-item']}>
             <span className={styles['label']}>Hacked Address:</span>
@@ -61,7 +60,7 @@ export function HackDetailsPage() {
           </div>
           <div className={styles['hack-item']}>
             <span className={styles['label']}>Hacked Amount:</span>
-            <span className={styles['value']}>{formatEther(hack.hackedAmount)} ETH</span>
+            <span className={styles['value']}>{formatEther(hack.hackedAmount)} WETH</span>
           </div>
           <div className={styles['hack-item']}>
             <span className={styles['label']}>Transaction hash:</span>

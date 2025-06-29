@@ -3,7 +3,7 @@ import { formatEther, getAddress } from 'ethers';
 import styles from './HackCard.module.css';
 import { HackDto, RESETRoutes } from 'models';
 import { useAccount } from 'wagmi';
-import { shortenAddress, decodeProtocolName } from '../HacksService/HacksService';
+import { shortenAddress } from '../HacksService/HacksService';
 import { useNavigate } from 'react-router-dom';
 
 export function HackCard({ hack }: { hack: HackDto }) {
@@ -40,7 +40,7 @@ export function HackCard({ hack }: { hack: HackDto }) {
     <div className={styles['hack-card']}>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Protocol Name:</span>
-        <span className={styles['value']}>{decodeProtocolName(hack.protocolName)}</span>
+        <span className={styles['value']}>{hack.protocolName}</span>
       </div>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Hacked Address:</span>
@@ -48,7 +48,7 @@ export function HackCard({ hack }: { hack: HackDto }) {
       </div>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Hacked Amount:</span>
-        <span className={styles['value']}>{formatEther(hack.hackedAmount)} ETH</span>
+        <span className={styles['value']}>{formatEther(hack.hackedAmount)} WETH</span>
       </div>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Transaction hash:</span>
@@ -62,7 +62,7 @@ export function HackCard({ hack }: { hack: HackDto }) {
       </div>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Initial Return Amount:</span>
-        <span className={styles['value']}>{formatEther(hack.initialOfferAmount)} ETH</span>
+        <span className={styles['value']}>{formatEther(hack.initialOfferAmount)} WETH</span>
       </div>     
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Initial Offer Validty:</span>
