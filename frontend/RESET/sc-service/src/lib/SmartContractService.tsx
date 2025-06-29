@@ -245,7 +245,7 @@ export async function RejectOffer(incidentAddress: string, offerId: number): Pro
 
     await Swal.fire({
       icon: 'success',
-      title: 'Offer Requested',
+      title: 'Offer Rejected',
       html: `Successfully rejected the offer.<br>
             <a href="https://sepolia.etherscan.io/tx/${tx.hash}" target="_blank" rel="noopener noreferrer">Click here to open transation in explorer...</a>`,
       customClass: {

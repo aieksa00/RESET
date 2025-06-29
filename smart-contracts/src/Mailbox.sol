@@ -3,18 +3,22 @@ pragma solidity ^0.8.24;
 
 import "./interfaces/IReset.sol";
 import "./interfaces/IIncident.sol";
+import "./interfaces/IEventEmitter.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 interface IOwnable {
     function owner() external view returns (address);
 }
 
-contract Mailbox {
+contract Mailbox is ReentrancyGuard{
     error IncidentDoesNotExist();
     error NoPublicKeyForRecipient();
     error NotAuthorized();
     error InvalidPublicKeyLength();
 
     IReset public reset;
+
+    IEventEmitter public eventEmitter;
 
     mapping(address => bytes) public publicKeys;
 
@@ -34,10 +38,6 @@ contract Mailbox {
     }
     mapping(address => SignedContract) private incidentSignedContracts; // incidentAddress => signed contract
 
-    event PublicKeyRegistered(address indexed user, bytes publicKey);
-    event MessageSent(address indexed incidentAddress, address indexed from, address indexed to, bytes encryptedMessage);
-    event SignedContractEvent(address indexed incidentAddress, address indexed creator, address indexed hacker, bytes contractData);
-
     modifier onlyIncident(address _incidentAddress) {
         bool isIncident = reset.isIncidentAddress(_incidentAddress);
         if (!isIncident) {
@@ -49,17 +49,19 @@ contract Mailbox {
         _;
     }
 
-    constructor(address _reset) {
+    constructor(address _reset, address _eventEmitter) {
         reset = IReset(_reset);
+        eventEmitter = IEventEmitter(_eventEmitter);
     }
 
-    function registerPublicKey(bytes calldata _publicKey) external {
+    function registerPublicKey(bytes calldata _publicKey) external nonReentrant {
         if (_publicKey.length != 64) {
             revert InvalidPublicKeyLength();
         }
 
         publicKeys[msg.sender] = _publicKey;
-        emit PublicKeyRegistered(msg.sender, _publicKey);
+
+        eventEmitter.emitMailboxPublicKeyRegistered(msg.sender, _publicKey);
     }
 
     function getIncidentParticipants(address _incidentAddress) public view returns (address creator, address hacker) {
@@ -72,7 +74,7 @@ contract Mailbox {
         hacker = IIncident(_incidentAddress).getHackerAddress();
     }
 
-    function signContract(address _incidentAddress, bytes calldata _contractData) external onlyIncident(_incidentAddress) {
+    function signContract(address _incidentAddress, bytes calldata _contractData) external onlyIncident(_incidentAddress) nonReentrant {
         (address creator, address hacker) = getIncidentParticipants(_incidentAddress);
 
         incidentSignedContracts[_incidentAddress] = SignedContract({
@@ -82,14 +84,14 @@ contract Mailbox {
             timestamp: block.timestamp
         });
         
-        emit SignedContractEvent(_incidentAddress, creator, hacker, _contractData);
+        eventEmitter.emitSignedContractEvent(_incidentAddress, creator, hacker, _contractData);
     }
 
     function getSignedContract(address _incidentAddress) external view returns (SignedContract memory) {
         return incidentSignedContracts[_incidentAddress];
     }
 
-    function sendMessage(address _incidentAddress, address _to, bytes calldata _encryptedMessage) external {
+    function sendMessage(address _incidentAddress, address _to, bytes calldata _encryptedMessage) external nonReentrant {
         (address creator, address hacker) = getIncidentParticipants(_incidentAddress);
         if (!((msg.sender == creator && _to == hacker) || (msg.sender == hacker && _to == creator))) {
             revert NotAuthorized();
@@ -105,7 +107,7 @@ contract Mailbox {
             encryptedMessage: _encryptedMessage,
             timestamp: block.timestamp
         }));
-        emit MessageSent(_incidentAddress, msg.sender, _to, _encryptedMessage);
+        eventEmitter.emitMessageSent(_incidentAddress, msg.sender, _to, _encryptedMessage);
     }
 
 
