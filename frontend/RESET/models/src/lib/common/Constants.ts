@@ -8,3 +8,4 @@ export const MailboxContractAddress = {
 
 export const GraphQueryAPIKey = "9f0f0cd72bc02f28154f9c0b2756a828";
 export const GraphQueryUrl = "https://api.studio.thegraph.com/query/81943/reset-subgraph/version/latest";
+

@@ -23,6 +23,7 @@ export default defineConfig(() => ({
       models: 'RESET/models/src/index.ts',
       SCService: 'RESET/sc-service/src/index.ts',
       HackDetailsPage: 'RESET/features/HackDetailsPage/src/index.ts',
+      ChatWindow: 'RESET/features/ChatWindow/src/index.ts',
     },
   },
   plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],

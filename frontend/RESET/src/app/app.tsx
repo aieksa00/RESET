@@ -7,6 +7,7 @@ import { LandingPage } from 'LandingPage';
 import { HacksPage } from 'HacksPage';
 import { CreateHackPage } from 'CreateHackPage';
 import { HackDetailsPage } from 'HackDetailsPage';
+import { ChatWindow } from 'ChatWindow';
 
 import '@rainbow-me/rainbowkit/styles.css';
 import { ConnectButton, getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit';
@@ -30,7 +31,6 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
-  
   const location = useLocation();
   const isFullPageRoute = location.pathname === RESETRoutes.Landing;
 
@@ -38,7 +38,7 @@ export function App() {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-        {isFullPageRoute ? (
+          {isFullPageRoute ? (
             // Render LandingPage as a full-page route
             <Routes>
               <Route path={RESETRoutes.Landing} element={<LandingPage />} />
@@ -63,6 +63,8 @@ export function App() {
                   <Route path={RESETRoutes.HackDetails} element={<HackDetailsPage />} />
                 </Routes>
               </div>
+              {/* Right Sidebar */}
+              <ChatWindow />
             </div>
           )}
         </RainbowKitProvider>

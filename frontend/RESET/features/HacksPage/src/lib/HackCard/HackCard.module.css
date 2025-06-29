@@ -62,7 +62,7 @@
 }
 
 .accept-button:hover {
-  transform: scale(1.05);
+  background-color: #5a00b5;
 }
 
 .send-msg-button {
@@ -79,7 +79,7 @@
 }
 
 .send-msg-button:hover {
-  transform: scale(1.05);
+  background-color: #c0c0c8;
 }
 
 .send-msg-button:disabled {
