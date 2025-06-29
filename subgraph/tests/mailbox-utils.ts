@@ -1,5 +1,5 @@
 import { newMockEvent } from "matchstick-as"
-import { ethereum, BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
+import { ethereum, Address, Bytes } from "@graphprotocol/graph-ts"
 import {
   MessageSent,
   PublicKeyRegistered,
@@ -7,7 +7,7 @@ import {
 } from "../generated/Mailbox/Mailbox"
 
 export function createMessageSentEvent(
-  incidentId: BigInt,
+  incidentAddress: Address,
   from: Address,
   to: Address,
   encryptedMessage: Bytes
@@ -18,8 +18,8 @@ export function createMessageSentEvent(
 
   messageSentEvent.parameters.push(
     new ethereum.EventParam(
-      "incidentId",
-      ethereum.Value.fromUnsignedBigInt(incidentId)
+      "incidentAddress",
+      ethereum.Value.fromAddress(incidentAddress)
     )
   )
   messageSentEvent.parameters.push(
@@ -57,7 +57,7 @@ export function createPublicKeyRegisteredEvent(
 }
 
 export function createSignedContractEventEvent(
-  incidentId: BigInt,
+  incidentAddress: Address,
   creator: Address,
   hacker: Address,
   contractData: Bytes
@@ -68,8 +68,8 @@ export function createSignedContractEventEvent(
 
   signedContractEventEvent.parameters.push(
     new ethereum.EventParam(
-      "incidentId",
-      ethereum.Value.fromUnsignedBigInt(incidentId)
+      "incidentAddress",
+      ethereum.Value.fromAddress(incidentAddress)
     )
   )
   signedContractEventEvent.parameters.push(

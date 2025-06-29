@@ -25,14 +25,42 @@ dataSources:
         - name: Reset
           file: ./abis/Reset.json
       eventHandlers:
-        - event: IncidentApproved(indexed uint256,indexed address,string,uint256,address,address,bytes32,uint256,uint256,address)
+        - event: IncidentApproved(indexed uint256,indexed
+            address,string,uint256,address,address,bytes32,uint256,uint256,address)
           handler: handleIncidentApproved
         - event: IncidentRequested(indexed uint256,indexed address)
           handler: handleIncidentRequested
-        - event: OfferEvent(indexed address,indexed uint256,indexed uint8,uint256,uint256,string,uint8)
+        - event: OfferEvent(indexed address,indexed uint256,indexed
+            uint8,uint256,uint256,string,uint8)
           handler: handleOfferEvent
         - event: OwnershipTransferStarted(indexed address,indexed address)
           handler: handleOwnershipTransferStarted
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
       file: ./src/reset.ts
+  - kind: ethereum
+    name: Mailbox
+    network: sepolia
+    source:
+      address: "0xd0df86242833cfDe00acd60Ae419f11C919E1611"
+      abi: Mailbox
+      startBlock: 8656372
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - MessageSent
+        - PublicKeyRegistered
+        - SignedContractEvent
+      abis:
+        - name: Mailbox
+          file: ./abis/Mailbox.json
+      eventHandlers:
+        - event: MessageSent(indexed address,indexed address,indexed address,bytes)
+          handler: handleMessageSent
+        - event: PublicKeyRegistered(indexed address,bytes)
+          handler: handlePublicKeyRegistered
+        - event: SignedContractEvent(indexed address,indexed address,indexed address,bytes)
+          handler: handleSignedContractEvent
+      file: ./src/mailbox.ts

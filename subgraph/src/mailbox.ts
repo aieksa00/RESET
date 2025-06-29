@@ -13,7 +13,7 @@ export function handleMessageSent(event: MessageSentEvent): void {
   let entity = new MessageSent(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
-  entity.incidentId = event.params.incidentId
+  entity.incidentAddress = event.params.incidentAddress
   entity.from = event.params.from
   entity.to = event.params.to
   entity.encryptedMessage = event.params.encryptedMessage
@@ -47,7 +47,7 @@ export function handleSignedContractEvent(
   let entity = new SignedContractEvent(
     event.transaction.hash.concatI32(event.logIndex.toI32()),
   )
-  entity.incidentId = event.params.incidentId
+  entity.incidentAddress = event.params.incidentAddress
   entity.creator = event.params.creator
   entity.hacker = event.params.hacker
   entity.contractData = event.params.contractData

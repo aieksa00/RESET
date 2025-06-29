@@ -6,7 +6,7 @@ import {
   beforeAll,
   afterAll
 } from "matchstick-as/assembly/index"
-import { BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
+import { Address, Bytes } from "@graphprotocol/graph-ts"
 import { MessageSent } from "../generated/schema"
 import { MessageSent as MessageSentEvent } from "../generated/Mailbox/Mailbox"
 import { handleMessageSent } from "../src/mailbox"
@@ -17,12 +17,14 @@ import { createMessageSentEvent } from "./mailbox-utils"
 
 describe("Describe entity assertions", () => {
   beforeAll(() => {
-    let incidentId = BigInt.fromI32(234)
+    let incidentAddress = Address.fromString(
+      "0x0000000000000000000000000000000000000001"
+    )
     let from = Address.fromString("0x0000000000000000000000000000000000000001")
     let to = Address.fromString("0x0000000000000000000000000000000000000001")
     let encryptedMessage = Bytes.fromI32(1234567890)
     let newMessageSentEvent = createMessageSentEvent(
-      incidentId,
+      incidentAddress,
       from,
       to,
       encryptedMessage
@@ -44,8 +46,8 @@ describe("Describe entity assertions", () => {
     assert.fieldEquals(
       "MessageSent",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "incidentId",
-      "234"
+      "incidentAddress",
+      "0x0000000000000000000000000000000000000001"
     )
     assert.fieldEquals(
       "MessageSent",

@@ -55,3 +55,33 @@ type OwnershipTransferred @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+type MessageSent @entity(immutable: true) {
+  id: Bytes!
+  incidentAddress: Bytes! # address
+  from: Bytes! # address
+  to: Bytes! # address
+  encryptedMessage: Bytes! # bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PublicKeyRegistered @entity(immutable: true) {
+  id: Bytes!
+  user: Bytes! # address
+  publicKey: Bytes! # bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SignedContractEvent @entity(immutable: true) {
+  id: Bytes!
+  incidentAddress: Bytes! # address
+  creator: Bytes! # address
+  hacker: Bytes! # address
+  contractData: Bytes! # bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
