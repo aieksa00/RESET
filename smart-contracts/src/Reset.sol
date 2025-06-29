@@ -228,6 +228,10 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
          IERC20(weth).safeTransfer(_receiver, IERC20(weth).balanceOf(address(this)));
     }
 
+    function isIncidentAddress(address _incidentAddress) external view returns (bool) {
+        return isIncident[_incidentAddress];
+    }
+
     receive() external payable {}
 
     fallback() external payable {}

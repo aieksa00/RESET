@@ -24,7 +24,7 @@ contract Mailbox {
         bytes encryptedMessage;
         uint256 timestamp;
     }
-    mapping(uint256 => Message[]) private incidentMessages; // incidentId => messages
+    mapping(address => Message[]) private incidentMessages; // incidentAddress => messages
 
     struct SignedContract {
         address protocolRepresentative; // creator of the incident (protocol representative)
@@ -32,18 +32,18 @@ contract Mailbox {
         bytes contractData;
         uint256 timestamp;
     }
-    mapping(uint256 => SignedContract) private incidentSignedContracts; // incidentId => signed contract
+    mapping(address => SignedContract) private incidentSignedContracts; // incidentAddress => signed contract
 
     event PublicKeyRegistered(address indexed user, bytes publicKey);
-    event MessageSent(uint256 indexed incidentId, address indexed from, address indexed to, bytes encryptedMessage);
-    event SignedContractEvent(uint256 indexed incidentId, address indexed creator, address indexed hacker, bytes contractData);
+    event MessageSent(address indexed incidentAddress, address indexed from, address indexed to, bytes encryptedMessage);
+    event SignedContractEvent(address indexed incidentAddress, address indexed creator, address indexed hacker, bytes contractData);
 
-    modifier onlyIncident(uint256 _incidentId) {
-        address incidentAddr = reset.getIncident(_incidentId);
-        if (incidentAddr == address(0)) {
+    modifier onlyIncident(address _incidentAddress) {
+        bool isIncident = reset.isIncidentAddress(_incidentAddress);
+        if (!isIncident) {
             revert IncidentDoesNotExist();
         }
-        if (msg.sender != incidentAddr) {
+        if (msg.sender != _incidentAddress) {
             revert NotAuthorized();
         }
         _;
@@ -62,36 +62,35 @@ contract Mailbox {
         emit PublicKeyRegistered(msg.sender, _publicKey);
     }
 
-    function getIncidentParticipants(uint256 _incidentId) public view returns (address creator, address hacker) {
-        address incidentAddr = reset.getIncident(_incidentId);
-
-        if (incidentAddr == address(0)) {
+    function getIncidentParticipants(address _incidentAddress) public view returns (address creator, address hacker) {
+        bool isIncident = reset.isIncidentAddress(_incidentAddress);
+        if (!isIncident) {
             revert IncidentDoesNotExist();
         }
 
-        creator = IOwnable(incidentAddr).owner();
-        hacker = IIncident(incidentAddr).getHackerAddress();
+        creator = IOwnable(_incidentAddress).owner();
+        hacker = IIncident(_incidentAddress).getHackerAddress();
     }
 
-    function signContract(uint256 _incidentId, bytes calldata _contractData) external onlyIncident(_incidentId) {
-        (address creator, address hacker) = getIncidentParticipants(_incidentId);
+    function signContract(address _incidentAddress, bytes calldata _contractData) external onlyIncident(_incidentAddress) {
+        (address creator, address hacker) = getIncidentParticipants(_incidentAddress);
 
-        incidentSignedContracts[_incidentId] = SignedContract({
+        incidentSignedContracts[_incidentAddress] = SignedContract({
             protocolRepresentative: creator,
             hacker: hacker,
             contractData: _contractData,
             timestamp: block.timestamp
         });
         
-        emit SignedContractEvent(_incidentId, creator, hacker, _contractData);
+        emit SignedContractEvent(_incidentAddress, creator, hacker, _contractData);
     }
 
-    function getSignedContract(uint256 _incidentId) external view returns (SignedContract memory) {
-        return incidentSignedContracts[_incidentId];
+    function getSignedContract(address _incidentAddress) external view returns (SignedContract memory) {
+        return incidentSignedContracts[_incidentAddress];
     }
 
-    function sendMessage(uint256 _incidentId, address _to, bytes calldata _encryptedMessage) external {
-        (address creator, address hacker) = getIncidentParticipants(_incidentId);
+    function sendMessage(address _incidentAddress, address _to, bytes calldata _encryptedMessage) external {
+        (address creator, address hacker) = getIncidentParticipants(_incidentAddress);
         if (!((msg.sender == creator && _to == hacker) || (msg.sender == hacker && _to == creator))) {
             revert NotAuthorized();
         }
@@ -100,18 +99,18 @@ contract Mailbox {
             revert NoPublicKeyForRecipient();
         }
 
-        incidentMessages[_incidentId].push(Message({
+        incidentMessages[_incidentAddress].push(Message({
             from: msg.sender,
             to: _to,
             encryptedMessage: _encryptedMessage,
             timestamp: block.timestamp
         }));
-        emit MessageSent(_incidentId, msg.sender, _to, _encryptedMessage);
+        emit MessageSent(_incidentAddress, msg.sender, _to, _encryptedMessage);
     }
 
 
-    function getMessages(uint256 _incidentId) external view returns (Message[] memory) {
-        return incidentMessages[_incidentId];
+    function getMessages(address _incidentAddress) external view returns (Message[] memory) {
+        return incidentMessages[_incidentAddress];
     }
 
     function getPublicKey(address _user) external view returns (bytes memory) {

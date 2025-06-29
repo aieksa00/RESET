@@ -52,4 +52,6 @@ interface IReset {
     function getFee() external view returns (uint256);
 
     function withdraw(address _receiver) external;
+
+    function isIncidentAddress(address _incidentAddress) external view returns (bool);
 }
