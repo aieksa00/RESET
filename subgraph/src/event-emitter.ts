@@ -1,4 +1,3 @@
-import { Bytes } from "@graphprotocol/graph-ts";
 import {
   IncidentEvent as IncidentEventEvent,
   IncidentRequested as IncidentRequestedEvent,
@@ -17,13 +16,11 @@ import {
 } from "../generated/schema"
 
 export function handleIncidentEvent(event: IncidentEventEvent): void {
-  let id = event.params.incidentAddress.toHex() + "-" + event.params.requestId.toString();
-  let entity = IncidentEvent.load(Bytes.fromUTF8(id));
-  if (entity == null) {
-    entity = new IncidentEvent(Bytes.fromUTF8(id));
-    entity.requestId = event.params.requestId;
-    entity.incidentAddress = event.params.incidentAddress;
-  }
+  let entity = new IncidentEvent(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.requestId = event.params.requestId
+  entity.incidentAddress = event.params.incidentAddress
   entity.protocolName = event.params.protocolName
   entity.hackedAmount = event.params.hackedAmount
   entity.exploitedAddress = event.params.exploitedAddress
@@ -88,13 +85,11 @@ export function handleMessageSent(event: MessageSentEvent): void {
 }
 
 export function handleOfferEvent(event: OfferEventEvent): void {
-  let id = event.params.incident.toHex() + "-" + event.params.offerId.toString();
-  let entity = OfferEvent.load(Bytes.fromUTF8(id));
-  if (entity == null) {
-    entity = new OfferEvent(Bytes.fromUTF8(id));
-    entity.incident = event.params.incident;
-    entity.offerId = event.params.offerId;
-  }
+  let entity = new OfferEvent(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.incident = event.params.incident
+  entity.offerId = event.params.offerId
   entity.proposer = event.params.proposer
   entity.returnAmount = event.params.returnAmount
   entity.validUntil = event.params.validUntil
