@@ -248,11 +248,7 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             revert OfferNotActive();
         }
 
-        if (offer.proposer == Proposer.Protocol) {
-            _rejectOfferHacker(offer);
-        } else {
-            _rejectOfferProtocol(offer);
-        }
+        offer.offerStatus = OfferStatus.Rejected;
 
         eventEmitter.emitOfferRejected(
             address(this),
@@ -262,14 +258,6 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             offer.validUntil,
             protocolName
         );
-    }
-
-    function _rejectOfferHacker(Offer storage offer) internal onlyHacker {
-        offer.offerStatus = OfferStatus.Rejected;
-    }
-
-    function _rejectOfferProtocol(Offer storage offer) internal onlyOwner {
-        offer.offerStatus = OfferStatus.Rejected;
     }
 
     function getHackerAddress() external view returns (address) {
