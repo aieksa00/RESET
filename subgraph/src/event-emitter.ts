@@ -16,11 +16,13 @@ import {
 } from "../generated/schema"
 
 export function handleIncidentEvent(event: IncidentEventEvent): void {
-  let entity = new IncidentEvent(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.requestId = event.params.requestId
-  entity.incidentAddress = event.params.incidentAddress
+  let id = event.params.incidentAddress.toHex() + "-" + event.params.requestId.toString();
+  let entity = IncidentEvent.load(id);
+  if (entity == null) {
+    entity = new IncidentEvent(id);
+    entity.requestId = event.params.requestId;
+    entity.incidentAddress = event.params.incidentAddress;
+  }
   entity.protocolName = event.params.protocolName
   entity.hackedAmount = event.params.hackedAmount
   entity.exploitedAddress = event.params.exploitedAddress
@@ -86,11 +88,13 @@ export function handleMessageSent(event: MessageSentEvent): void {
 }
 
 export function handleOfferEvent(event: OfferEventEvent): void {
-  let entity = new OfferEvent(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.incident = event.params.incident
-  entity.offerId = event.params.offerId
+  let id = event.params.incident.toHex() + "-" + event.params.offerId.toString();
+  let entity = OfferEvent.load(id);
+  if (entity == null) {
+    entity = new OfferEvent(id);
+    entity.incident = event.params.incident;
+    entity.offerId = event.params.offerId;
+  }
   entity.proposer = event.params.proposer
   entity.returnAmount = event.params.returnAmount
   entity.validUntil = event.params.validUntil
