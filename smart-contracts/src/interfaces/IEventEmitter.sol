@@ -47,7 +47,7 @@ interface IEventEmitter {
 
     function emitMailboxPublicKeyRegistered(address _user, bytes memory _publicKey) external;
 
-    function emitMessageSent(address _incidentAddress, address _from, address _to, bytes memory _encryptedMessage) external;
+    function emitMessageSent(address _incidentAddress, address _from, address _to, bytes memory _encryptedMessage, uint256 _timestamp) external;
 
-    function emitSignedContractEvent(address _incidentAddress, address _creator, address _hacker, bytes memory _contractData) external;
+    function emitSignedContractEvent(address _incidentAddress, address _creator, address _hacker, bytes memory _contractData, uint256 _timestamp) external;
 }

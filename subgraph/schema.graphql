@@ -1,4 +1,4 @@
-type IncidentEvent @entity(immutable: true) {
+type IncidentEvent @entity(immutable: false) {
   id: String!
   requestId: BigInt! # uint256
   incidentAddress: Bytes! # address
@@ -45,7 +45,7 @@ type MessageSent @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type OfferEvent @entity(immutable: true) {
+type OfferEvent @entity(immutable: false) {
   id: String!
   incident: Bytes! # address
   offerId: BigInt! # uint256

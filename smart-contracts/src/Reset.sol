@@ -39,13 +39,13 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     address public weth;
     address public mailbox;
 
-    uint256 public fee; // in bps
-
     IEventEmitter public eventEmitter;
 
-    constructor(address _weth, uint256 _fee) Ownable(_msgSender()) {
+    address public feeCalculator;
+
+    constructor(address _weth, address _feeCalculator) Ownable(_msgSender()) {
         weth = _weth;
-        fee = _fee;
+        feeCalculator = _feeCalculator;
     }
 
     function setMailbox(address _mailbox) external onlyOwner {
@@ -189,12 +189,6 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
         }
 
         return incidents[_incidentId];
-    }
-
-    
-
-    function getFee() external view returns (uint256) {
-        return fee;
     }
 
      function withdraw(address _receiver) external onlyOwner nonReentrant {

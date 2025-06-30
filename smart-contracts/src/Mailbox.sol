@@ -80,7 +80,7 @@ contract Mailbox is ReentrancyGuard{
             timestamp: block.timestamp
         });
         
-        eventEmitter.emitSignedContractEvent(_incidentAddress, creator, hacker, _contractData);
+        eventEmitter.emitSignedContractEvent(_incidentAddress, creator, hacker, _contractData, block.timestamp);
     }
 
     function getSignedContract(address _incidentAddress) external view returns (SignedContract memory) {
@@ -103,7 +103,7 @@ contract Mailbox is ReentrancyGuard{
             encryptedMessage: _encryptedMessage,
             timestamp: block.timestamp
         }));
-        eventEmitter.emitMessageSent(_incidentAddress, msg.sender, _to, _encryptedMessage);
+        eventEmitter.emitMessageSent(_incidentAddress, msg.sender, _to, _encryptedMessage, block.timestamp);
     }
 
 

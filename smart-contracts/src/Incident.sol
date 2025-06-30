@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IReset.sol";
 import "./interfaces/IEventEmitter.sol";
+import "./interfaces/IFeeCalculator.sol";
 
 contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -61,6 +62,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
 
     IEventEmitter public eventEmitter;
 
+    IFeeCalculator public feeCalculator;
+
     modifier onlyHackerOrOwner() {
         if (_msgSender() != hackerAddress && _msgSender() != owner()) {
             revert OnlyHackerOrOwner();
@@ -99,6 +102,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         incidentId = _incidentId;
 
         eventEmitter = IEventEmitter(_eventEmitter);
+
+        feeCalculator = IFeeCalculator(IReset(reset).feeCalculator());
         
         offers[offersCount] = Offer({
             proposer: Proposer.Protocol,
@@ -127,10 +132,6 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             validUntil: _validUntil,
             offerStatus: OfferStatus.Pending
         });
-
-        if (_proposer == Proposer.Hacker) {
-            weth.forceApprove(address(this), _returnAmount);
-        }
 
         eventEmitter.emitNewOffer(
             address(this),
@@ -205,8 +206,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
 
         (uint256 feeAmount, uint256 payoutAmount) = _calculateFeeAndPayout(offer.returnAmount);
 
-        weth.safeTransfer(reset, feeAmount);
-        weth.safeTransfer(owner(), payoutAmount);
+        weth.safeTransferFrom(hackerAddress, reset, feeAmount);
+        weth.safeTransferFrom(hackerAddress, owner(), payoutAmount);
     }
 
     function _acceptOfferProtocol(Offer storage offer) internal onlyOwner {
@@ -219,13 +220,12 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         weth.safeTransferFrom(hackerAddress, _msgSender(), payoutAmount);
     }
 
-    function _calculateFeeAndPayout(uint256 amount) internal view returns (uint256 feeAmount, uint256 payoutAmount) {
-        uint256 fee = IReset(reset).getFee();
-        feeAmount = (amount * fee) / 10000;
-        payoutAmount = amount - feeAmount;
+    function _calculateFeeAndPayout(uint256 _amount) internal view returns (uint256 feeAmount, uint256 payoutAmount) {
+        feeAmount = feeCalculator.calculateFee(_amount);
+        payoutAmount = _amount - feeAmount;
     }
 
-    function RejectOffer(uint256 _offerId) external onlyHackerOrOwner nonReentrant {
+    function rejectOffer(uint256 _offerId) external onlyHackerOrOwner nonReentrant {
         if (status != Status.Active) {
             revert IncidentNotActive();
         }

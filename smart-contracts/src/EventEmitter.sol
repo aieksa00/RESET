@@ -33,8 +33,8 @@ contract EventEmitter is IEventEmitter{
         uint8 eventType
     );
     event MailboxPublicKeyRegistered(address indexed user, bytes publicKey);
-    event MessageSent(address indexed incidentAddress, address indexed from, address indexed to, bytes encryptedMessage);
-    event SignedContractEvent(address indexed incidentAddress, address indexed creator, address indexed hacker, bytes contractData);
+    event MessageSent(address indexed incidentAddress, address indexed from, address indexed to, bytes encryptedMessage, uint256 timestamp);
+    event SignedContractEvent(address indexed incidentAddress, address indexed creator, address indexed hacker, bytes contractData, uint256 timestamp);
 
     modifier onlyIncident() {
         if (!reset.isIncidentAddress(msg.sender)) {
@@ -150,11 +150,11 @@ function emitNewOffer(
         emit MailboxPublicKeyRegistered(_user, _publicKey);
     }
 
-    function emitMessageSent(address _incidentAddress, address _from, address _to, bytes memory _encryptedMessage) external {
-        emit MessageSent(_incidentAddress, _from, _to, _encryptedMessage);
+    function emitMessageSent(address _incidentAddress, address _from, address _to, bytes memory _encryptedMessage, uint256 _timestamp) external {
+        emit MessageSent(_incidentAddress, _from, _to, _encryptedMessage, _timestamp);
     }
 
-    function emitSignedContractEvent(address _incidentAddress, address _creator, address _hacker, bytes memory _contractData) external {
-        emit SignedContractEvent(_incidentAddress, _creator, _hacker, _contractData);
+    function emitSignedContractEvent(address _incidentAddress, address _creator, address _hacker, bytes memory _contractData, uint256 _timestamp) external {
+        emit SignedContractEvent(_incidentAddress, _creator, _hacker, _contractData, _timestamp);
     }
 }

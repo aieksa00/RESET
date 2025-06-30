@@ -6,20 +6,40 @@ import "../src/Reset.sol";
 import "../src/EventEmitter.sol";
 import "../src/Mailbox.sol";
 import "../src/Incident.sol";
-import "../src/interfaces/IReset.sol";
-import "../src/interfaces/IEventEmitter.sol";
+import "../src/FeeCalculator.sol";
 
 contract ResetTest is Test {
     Reset public reset;
     EventEmitter public eventEmitter;
     Mailbox public mailbox;
+    FeeCalculator public feeCalculator;
     address public weth = address(0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9);
     address public owner = address(this);
     address public hacker = address(0xBEEF);
     address public exploited = address(0xCAFE);
 
     function setUp() public {
-        reset = new Reset(weth, 150);
+
+        uint256[] memory usdTiers = new uint256[](3);
+        usdTiers[0] = 100_000;
+        usdTiers[1] = 1_000_000;
+        usdTiers[2] = 10_000_000;
+
+        uint256[] memory bpsTiers = new uint256[](4);
+        bpsTiers[0] = 100;
+        bpsTiers[1] = 50;
+        bpsTiers[2] = 10;
+        bpsTiers[3] = 5;
+
+        feeCalculator = new FeeCalculator(
+            0x694AA1769357215DE4FAC081bf1f309aDC325306,
+            86400,
+            usdTiers,
+            bpsTiers
+        );
+        console.log("FeeCalculator deployed at:", address(feeCalculator));
+        
+        reset = new Reset(weth, address(feeCalculator));
         console.log("Reset deployed at:", address(reset));
 
         eventEmitter = new EventEmitter(address(reset));
@@ -40,7 +60,7 @@ contract ResetTest is Test {
         uint256 hackedAmount = 1 ether;
         bytes32 txHash = keccak256("txhash");
         uint256 initialOfferAmount = 0.5 ether;
-        uint256 initialOfferValidity = 1 days;
+        uint256 initialOfferValidity = block.timestamp + 1 days;
 
         reset.requestIncident(
             protocolName,
@@ -56,5 +76,95 @@ contract ResetTest is Test {
 
         address incidentAddr = reset.getIncident(0);
         assertTrue(reset.isIncidentAddress(incidentAddr));
+    }
+        
+    function testRejectOfferByHacker() public {
+        string memory protocolName = "TestProtocol";
+        uint256 hackedAmount = 1 ether;
+        bytes32 txHash = keccak256("txhash");
+        uint256 initialOfferAmount = 0.5 ether;
+        uint256 initialOfferValidity = block.timestamp + 1 days;
+
+        reset.requestIncident(
+            protocolName,
+            exploited,
+            hackedAmount,
+            hacker,
+            txHash,
+            initialOfferAmount,
+            initialOfferValidity
+        );
+
+        reset.approveIncident(0);
+
+        address incidentAddr = reset.getIncident(0);
+
+        vm.prank(hacker);
+        IIncident(incidentAddr).rejectOffer(0);
+    }
+
+    function testAcceptOfferByHacker() public {
+        string memory protocolName = "TestProtocol";
+        uint256 hackedAmount = 1 ether;
+        bytes32 txHash = keccak256("txhash");
+        uint256 initialOfferAmount = 0.5 ether;
+        uint256 initialOfferValidity = block.timestamp + 1 days;
+
+        reset.requestIncident(
+            protocolName,
+            exploited,
+            hackedAmount,
+            hacker,
+            txHash,
+            initialOfferAmount,
+            initialOfferValidity
+        );
+
+        reset.approveIncident(0);
+
+        deal(weth, hacker, initialOfferAmount);
+
+        address incidentAddr = reset.getIncident(0);
+
+        vm.prank(hacker);
+        IERC20(weth).approve(incidentAddr, initialOfferAmount);
+
+        vm.prank(hacker);
+        IIncident(incidentAddr).acceptOffer(0);
+    }
+
+    function testHackerCreatesOfferAndOwnerAccepts() public {
+        string memory protocolName = "TestProtocol";
+        uint256 hackedAmount = 1 ether;
+        bytes32 txHash = keccak256("txhash");
+        uint256 initialOfferAmount = 0.5 ether;
+        uint256 initialOfferValidity = block.timestamp + 1 days;
+
+        reset.requestIncident(
+            protocolName,
+            exploited,
+            hackedAmount,
+            hacker,
+            txHash,
+            initialOfferAmount,
+            initialOfferValidity
+        );
+        reset.approveIncident(0);
+
+        address incidentAddr = reset.getIncident(0);
+
+        uint256 hackerOfferAmount = 0.3 ether;
+        uint256 hackerOfferValidity = block.timestamp + 2 days;
+
+        vm.prank(hacker);
+        IERC20(weth).approve(incidentAddr, hackerOfferAmount);
+        
+        vm.prank(hacker);
+        IIncident(incidentAddr).newOffer(hackerOfferAmount, hackerOfferValidity);
+
+        deal(weth, hacker, hackerOfferAmount);
+
+        // Owner accepts the offer
+        IIncident(incidentAddr).acceptOffer(1);
     }
 }
