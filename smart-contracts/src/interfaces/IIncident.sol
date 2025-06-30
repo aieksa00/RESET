@@ -11,4 +11,6 @@ interface IIncident {
     function getHackerAddress() external view returns (address);
 
     function getStatus() external view returns (uint8);
+
+    function getOffer(uint256 _offerId) external view returns (uint8, uint256, uint256, uint8);
 }

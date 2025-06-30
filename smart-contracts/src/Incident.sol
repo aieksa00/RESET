@@ -99,22 +99,15 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         incidentId = _incidentId;
 
         eventEmitter = IEventEmitter(_eventEmitter);
+        
+        offers[offersCount] = Offer({
+            proposer: Proposer.Protocol,
+            returnAmount: _initialOfferAmount,
+            validUntil: _initialOfferValidity,
+            offerStatus: OfferStatus.Pending
+        });
 
-        address mailbox = IReset(reset).getMailbox();
-        bytes memory contractData = abi.encodePacked(
-            "Protocol agrees not to take any legal action against the hacker if the incident is resolved and they found common ground."
-        );
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, ) = mailbox.call(
-            abi.encodeWithSignature(
-                "signContract(uint256,bytes)",
-                _incidentId,
-                contractData
-            )
-        );
-        require(success, "Mailbox signContract failed");
-
-        _newOffer(Proposer.Protocol, _initialOfferAmount, _initialOfferValidity);
+        offersCount++;
     }
 
     function newOffer(uint256 _returnAmount, uint256 _validUntil) external onlyHackerOrOwner nonReentrant {
@@ -281,6 +274,15 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
 
     function getStatus() external view returns (uint8) {
         return uint8(status);
+    }
+
+    function getOffer(uint256 _offerId) external view returns (uint8, uint256, uint256, uint8) {
+        if (_offerId >= offersCount) {
+            revert OfferDoesNotExist();
+        }
+
+        Offer storage offer = offers[_offerId];
+        return (uint8(offer.proposer), offer.returnAmount, offer.validUntil, uint8(offer.offerStatus));
     }
 
     receive() external payable {}

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IEventEmitter.sol";
+import "./interfaces/IIncident.sol";
 
 contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -132,12 +133,25 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
             incidentRequest.initialOfferValidity,
             incidentRequest.creator,
             weth,
-            incidentRequestCount,
+            _requestId,
             address(eventEmitter)
         );
 
         incidents.push(address(incident));
         isIncident[address(incident)] = true;
+
+        bytes memory contractData = abi.encodePacked(
+            "Protocol agrees not to take any legal action against the hacker if the incident is resolved and they found common ground."
+        );
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, ) = mailbox.call(
+            abi.encodeWithSignature(
+                "signContract(address,bytes)",
+                address(incident),
+                contractData
+            )
+        );
+        require(success, "Mailbox signContract failed");
 
         uint8 status = IIncident(incident).getStatus();
 
@@ -153,6 +167,15 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
             incidentRequest.initialOfferValidity,
             incidentRequest.creator,
             status
+        );
+
+        eventEmitter.emitNewOffer(
+            address(incident),
+            0,
+            1, // Proposer.Protocol
+            incidentRequest.initialOfferAmount,
+            incidentRequest.initialOfferValidity,
+            incidentRequest.protocolName
         );
     }
 

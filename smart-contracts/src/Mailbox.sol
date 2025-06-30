@@ -38,12 +38,8 @@ contract Mailbox is ReentrancyGuard{
     }
     mapping(address => SignedContract) private incidentSignedContracts; // incidentAddress => signed contract
 
-    modifier onlyIncident(address _incidentAddress) {
-        bool isIncident = reset.isIncidentAddress(_incidentAddress);
-        if (!isIncident) {
-            revert IncidentDoesNotExist();
-        }
-        if (msg.sender != _incidentAddress) {
+    modifier onlyReset() {
+        if (msg.sender != address(reset)) {
             revert NotAuthorized();
         }
         _;
@@ -74,7 +70,7 @@ contract Mailbox is ReentrancyGuard{
         hacker = IIncident(_incidentAddress).getHackerAddress();
     }
 
-    function signContract(address _incidentAddress, bytes calldata _contractData) external onlyIncident(_incidentAddress) nonReentrant {
+    function signContract(address _incidentAddress, bytes calldata _contractData) external onlyReset nonReentrant {
         (address creator, address hacker) = getIncidentParticipants(_incidentAddress);
 
         incidentSignedContracts[_incidentAddress] = SignedContract({

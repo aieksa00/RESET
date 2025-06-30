@@ -96,7 +96,7 @@ function emitNewOffer(
         uint256 _returnAmount,
         uint256 _validUntil,
         string memory _protocolName
-    ) external onlyIncident {
+    ) external onlyResetOrIncident {
         emit OfferEvent(
             _incident,
             _offerId,
