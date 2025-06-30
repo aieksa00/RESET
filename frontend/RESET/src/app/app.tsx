@@ -62,7 +62,7 @@ function AppContent() {
           </div>
 
           {Array.from(chatWindows.entries()).map(([id, chat]) => (
-            <ChatWindow key={id} id={id} title={`Chat - ${chat.protocolName}`} />
+            <ChatWindow key={id} id={id} title={`Chat - ${chat.protocolName}`} hackerAddress={chat.hackerAddress} creatorAddress={chat.creatorAddress} sharedSecret={chat.sharedSecret}/>
           ))}
         </div>
       )}

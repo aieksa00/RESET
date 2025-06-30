@@ -1,19 +1,38 @@
 import styles from './ChatWindow.module.css';
 import { useState, useRef, useEffect } from 'react';
 import { useChatWindows } from '@providers';
+import { useForm } from 'react-hook-form';
 
 interface ChatWindowProps {
   id: string;
   title: string;
+  hackerAddress: string;
+  creatorAddress: string;
+  sharedSecret: Buffer;
 }
 
-export function ChatWindow({ id, title }: ChatWindowProps) {
+export function ChatWindow(props: ChatWindowProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const dialogRef = useRef<HTMLDivElement>(null);
 
   const { chatWindows, closeChat, updatePosition } = useChatWindows();
-  const chatWindow = chatWindows.get(id);
+  const chatWindow = chatWindows.get(props.id);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      message: '',
+    },
+  });
+
+  const onSubmit = (messageData: { message: string }) => {
+    console.log('Encrypt me:', props.sharedSecret);
+    console.log('Message sent:', messageData.message);
+  };
 
   useEffect(() => {
     if (isDragging) {
@@ -45,7 +64,7 @@ export function ChatWindow({ id, title }: ChatWindowProps) {
       const maxX = window.innerWidth - (dialogRef.current?.offsetWidth || 0);
       const maxY = window.innerHeight - (dialogRef.current?.offsetHeight || 0);
 
-      updatePosition(id, {
+      updatePosition(props.id, {
         x: Math.min(Math.max(0, newX), maxX),
         y: Math.min(Math.max(0, newY), maxY),
       });
@@ -69,14 +88,30 @@ export function ChatWindow({ id, title }: ChatWindowProps) {
       onMouseDown={handleMouseDown}
     >
       <div className={styles['chat-header']}>
-        <h3>{title}</h3>
-        <button className={styles['close-button']} onClick={() => closeChat(id)} aria-label="Close chat">
+        <h3>{props.title}</h3>
+        <button className={styles['close-button']} onClick={() => closeChat(props.id)} aria-label="Close chat">
           ×
         </button>
       </div>
       <div className={styles['chat-content']}>
         
       </div>
+      <form onSubmit={handleSubmit(onSubmit)} className={styles['chat-form']}>
+          <div className={`${styles['input-container']} ${errors.message ? styles['error-border'] : ''}`}>
+            <input
+              type="text"
+              id="message"
+              {...register('message', {
+                required: 'Message can not be empty.',
+              })}
+              className={styles['message-input']}
+            />
+            {errors.message && <p className={styles['error-message']}>{errors.message.message}</p>}
+          </div>
+          <button type="submit" className={styles['send-button']}>
+            Send
+          </button>
+        </form>
     </div>
   );
 }

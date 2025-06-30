@@ -35,7 +35,10 @@ export function HackCard({ hack }: { hack: HackDto }) {
   };
 
   const handleSendMessage = () => {
-    openChat(hack.id, hack.protocolName);
+    // TODO: Implement the logic before opening
+    // generate shared secret and store it in local storage if not exists
+    const sharedSecret: Buffer;
+    openChat(hack.id, hack.protocolName, hack.hackerAddress, hack.creator, sharedSecret);
   };
 
   return (
