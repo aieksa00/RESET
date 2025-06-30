@@ -18,6 +18,21 @@ contract ResetTest is Test {
     address public hacker = address(0xBEEF);
     address public exploited = address(0xCAFE);
 
+    event IncidentRequested(uint256 indexed requestId, address indexed creator);
+    event IncidentEvent(uint256 indexed requestId, address indexed incidentAddress, string protocolName, uint256 hackedAmount, address exploitedAddress, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator, uint8 status);
+    event OfferEvent(
+        address indexed incident,
+        uint256 indexed offerId,
+        uint8 indexed proposer,
+        uint256 returnAmount,
+        uint256 validUntil,
+        string protocolName,
+        uint8 eventType
+    );
+    event MailboxPublicKeyRegistered(address indexed user, bytes publicKey);
+    event MessageSent(address indexed incidentAddress, address indexed from, address indexed to, bytes encryptedMessage, uint256 timestamp);
+    event SignedContractEvent(address indexed incidentAddress, address indexed creator, address indexed hacker, bytes contractData, uint256 timestamp);
+
     function setUp() public {
 
         uint256[] memory usdTiers = new uint256[](3);
@@ -62,6 +77,8 @@ contract ResetTest is Test {
         uint256 initialOfferAmount = 0.5 ether;
         uint256 initialOfferValidity = block.timestamp + 1 days;
 
+        vm.expectEmit(true, true, false, false, address(eventEmitter));
+        emit IncidentRequested(0, address(this));
         reset.requestIncident(
             protocolName,
             exploited,
@@ -75,6 +92,7 @@ contract ResetTest is Test {
         reset.approveIncident(0);
 
         address incidentAddr = reset.getIncident(0);
+
         assertTrue(reset.isIncidentAddress(incidentAddr));
     }
         
@@ -94,11 +112,19 @@ contract ResetTest is Test {
             initialOfferAmount,
             initialOfferValidity
         );
-
         reset.approveIncident(0);
-
         address incidentAddr = reset.getIncident(0);
 
+        vm.expectEmit(true, true, true, false, address(eventEmitter));
+        emit OfferEvent(
+            incidentAddr,
+            0,
+            1, // Proposer.Protocol
+            initialOfferAmount,
+            initialOfferValidity,
+            protocolName,
+            2 // OfferEventType.Rejected
+        );
         vm.prank(hacker);
         IIncident(incidentAddr).rejectOffer(0);
     }
@@ -119,16 +145,22 @@ contract ResetTest is Test {
             initialOfferAmount,
             initialOfferValidity
         );
-
         reset.approveIncident(0);
-
         deal(weth, hacker, initialOfferAmount);
-
         address incidentAddr = reset.getIncident(0);
-
         vm.prank(hacker);
         IERC20(weth).approve(incidentAddr, initialOfferAmount);
 
+        vm.expectEmit(true, true, true, false, address(eventEmitter));
+        emit OfferEvent(
+            incidentAddr,
+            0,
+            1, // Proposer.Protocol
+            initialOfferAmount,
+            initialOfferValidity,
+            protocolName,
+            1 // OfferEventType.Accepted
+        );
         vm.prank(hacker);
         IIncident(incidentAddr).acceptOffer(0);
     }
@@ -150,21 +182,76 @@ contract ResetTest is Test {
             initialOfferValidity
         );
         reset.approveIncident(0);
-
         address incidentAddr = reset.getIncident(0);
-
         uint256 hackerOfferAmount = 0.3 ether;
         uint256 hackerOfferValidity = block.timestamp + 2 days;
 
         vm.prank(hacker);
         IERC20(weth).approve(incidentAddr, hackerOfferAmount);
-        
+
+        vm.expectEmit(true, true, true, false, address(eventEmitter));
+        emit OfferEvent(
+            incidentAddr,
+            1,
+            0, // Proposer.Hacker
+            hackerOfferAmount,
+            hackerOfferValidity,
+            protocolName,
+            0 // OfferEventType.New
+        );
         vm.prank(hacker);
         IIncident(incidentAddr).newOffer(hackerOfferAmount, hackerOfferValidity);
 
         deal(weth, hacker, hackerOfferAmount);
 
-        // Owner accepts the offer
+        vm.expectEmit(true, true, true, false, address(eventEmitter));
+        emit OfferEvent(
+            incidentAddr,
+            1,
+            0, // Proposer.Hacker
+            hackerOfferAmount,
+            hackerOfferValidity,
+            protocolName,
+            1 // OfferEventType.Accepted
+        );
         IIncident(incidentAddr).acceptOffer(1);
     }
+
+    function testHackerCreatesOffer_ExpectEvent() public {
+    string memory protocolName = "TestProtocol";
+    uint256 hackedAmount = 1 ether;
+    bytes32 txHash = keccak256("txhash");
+    uint256 initialOfferAmount = 0.5 ether;
+    uint256 initialOfferValidity = block.timestamp + 1 days;
+
+    reset.requestIncident(
+        protocolName,
+        exploited,
+        hackedAmount,
+        hacker,
+        txHash,
+        initialOfferAmount,
+        initialOfferValidity
+    );
+    reset.approveIncident(0);
+
+    address incidentAddr = reset.getIncident(0);
+
+    uint256 hackerOfferAmount = 0.3 ether;
+    uint256 hackerOfferValidity = block.timestamp + 2 days;
+
+    vm.expectEmit(true, true, true, true, address(eventEmitter));
+    emit OfferEvent(
+        incidentAddr,
+        1, // offerId (0 je inicijalni, 1 je novi)
+        uint8(0), // Proposer.Hacker
+        hackerOfferAmount,
+        hackerOfferValidity,
+        protocolName,
+        0 // OfferEventType.New
+    );
+
+    vm.prank(hacker);
+    IIncident(incidentAddr).newOffer(hackerOfferAmount, hackerOfferValidity);
+}
 }
