@@ -8,9 +8,9 @@ dataSources:
     name: EventEmitter
     network: sepolia
     source:
-      address: "0x19D25142cCC9Fa1Dcec443664888508a1F73e088"
+      address: "0xadE485363904DD40BBF7b49609B1070e42525124"
       abi: EventEmitter
-      startBlock: 8660295
+      startBlock: 8663828
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
@@ -32,10 +32,10 @@ dataSources:
           handler: handleIncidentRequested
         - event: MailboxPublicKeyRegistered(indexed address,bytes)
           handler: handleMailboxPublicKeyRegistered
-        - event: MessageSent(indexed address,indexed address,indexed address,bytes)
+        - event: MessageSent(indexed address,indexed address,indexed address,bytes,uint256)
           handler: handleMessageSent
         - event: OfferEvent(indexed address,indexed uint256,indexed uint8,uint256,uint256,string,uint8)
           handler: handleOfferEvent
-        - event: SignedContractEvent(indexed address,indexed address,indexed address,bytes)
+        - event: SignedContractEvent(indexed address,indexed address,indexed address,bytes,uint256)
           handler: handleSignedContractEvent
       file: ./src/event-emitter.ts

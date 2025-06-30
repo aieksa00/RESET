@@ -134,7 +134,8 @@ export function createMessageSentEvent(
   incidentAddress: Address,
   from: Address,
   to: Address,
-  encryptedMessage: Bytes
+  encryptedMessage: Bytes,
+  timestamp: BigInt
 ): MessageSent {
   let messageSentEvent = changetype<MessageSent>(newMockEvent())
 
@@ -156,6 +157,12 @@ export function createMessageSentEvent(
     new ethereum.EventParam(
       "encryptedMessage",
       ethereum.Value.fromBytes(encryptedMessage)
+    )
+  )
+  messageSentEvent.parameters.push(
+    new ethereum.EventParam(
+      "timestamp",
+      ethereum.Value.fromUnsignedBigInt(timestamp)
     )
   )
 
@@ -222,7 +229,8 @@ export function createSignedContractEventEvent(
   incidentAddress: Address,
   creator: Address,
   hacker: Address,
-  contractData: Bytes
+  contractData: Bytes,
+  timestamp: BigInt
 ): SignedContractEvent {
   let signedContractEventEvent = changetype<SignedContractEvent>(newMockEvent())
 
@@ -244,6 +252,12 @@ export function createSignedContractEventEvent(
     new ethereum.EventParam(
       "contractData",
       ethereum.Value.fromBytes(contractData)
+    )
+  )
+  signedContractEventEvent.parameters.push(
+    new ethereum.EventParam(
+      "timestamp",
+      ethereum.Value.fromUnsignedBigInt(timestamp)
     )
   )
 

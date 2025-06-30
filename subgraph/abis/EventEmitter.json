@@ -146,6 +146,12 @@
         "internalType": "bytes",
         "name": "encryptedMessage",
         "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
     "name": "MessageSent",
@@ -226,6 +232,12 @@
         "internalType": "bytes",
         "name": "contractData",
         "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
     "name": "SignedContractEvent",
@@ -299,7 +311,8 @@
       },
       { "internalType": "address", "name": "_from", "type": "address" },
       { "internalType": "address", "name": "_to", "type": "address" },
-      { "internalType": "bytes", "name": "_encryptedMessage", "type": "bytes" }
+      { "internalType": "bytes", "name": "_encryptedMessage", "type": "bytes" },
+      { "internalType": "uint256", "name": "_timestamp", "type": "uint256" }
     ],
     "name": "emitMessageSent",
     "outputs": [],
@@ -357,7 +370,8 @@
       },
       { "internalType": "address", "name": "_creator", "type": "address" },
       { "internalType": "address", "name": "_hacker", "type": "address" },
-      { "internalType": "bytes", "name": "_contractData", "type": "bytes" }
+      { "internalType": "bytes", "name": "_contractData", "type": "bytes" },
+      { "internalType": "uint256", "name": "_timestamp", "type": "uint256" }
     ],
     "name": "emitSignedContractEvent",
     "outputs": [],

@@ -116,6 +116,10 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
     }
 
     function newOffer(uint256 _returnAmount, uint256 _validUntil) external onlyHackerOrOwner nonReentrant {
+        if (status != Status.Active) {
+            revert IncidentNotActive();
+        }
+        
         if (_returnAmount > hackedAmount) {
             revert cantOfferMoreThanHackedAmount();
         }
