@@ -61,8 +61,8 @@ function AppContent() {
             </Routes>
           </div>
 
-          {Array.from(chatWindows.entries()).map(([id, window]) => (
-            <ChatWindow key={id} id={id} title={`Chat - ${id}`} />
+          {Array.from(chatWindows.entries()).map(([id, chat]) => (
+            <ChatWindow key={id} id={id} title={`Chat - ${chat.protocolName}`} />
           ))}
         </div>
       )}

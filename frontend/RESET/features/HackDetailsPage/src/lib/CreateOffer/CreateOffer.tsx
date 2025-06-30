@@ -3,26 +3,32 @@ import styles from './CreateOffer.module.css';
 import { useForm } from 'react-hook-form';
 
 import { CreateOfferFormData } from 'models';
-import { NewOffer } from 'SCService';
-import { formatEther } from 'ethers';
+import { ApproveHackerOffer, NewOffer } from 'SCService';
+import { ethers, formatEther } from 'ethers';
 
-export function CreateOffer({
-  incidentAddress,
-  canCreateOffer,
-  maxOfferAmount,
-}: {
+interface CreateOfferProps {
   incidentAddress: string;
   canCreateOffer: boolean;
+  isHacker: boolean;
   maxOfferAmount: bigint;
-}) {
+}
+
+export function CreateOffer(props: CreateOfferProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<CreateOfferFormData>();
 
-  const onSubmit = (data: CreateOfferFormData) => {
-    NewOffer(incidentAddress, data);
+  const onSubmit = async (data: CreateOfferFormData) => {
+    if (props.isHacker) {
+      const isSuccesfull = await ApproveHackerOffer(props.incidentAddress, ethers.parseEther(data.amount.toString()));
+      console.log('Approve Hacker Offer Result:', isSuccesfull);
+      if (!isSuccesfull) {
+        return;
+      }
+    }
+    NewOffer(props.incidentAddress, data);
   };
 
   return (
@@ -39,13 +45,13 @@ export function CreateOffer({
             id="amount"
             {...register('amount', {
               required: 'Amount is required',
-              max: { value: Number(formatEther(maxOfferAmount)), message: `Maximum offer amount is ${formatEther(maxOfferAmount)} ETH` },
+              max: { value: Number(formatEther(props.maxOfferAmount)), message: `Maximum offer amount is ${formatEther(props.maxOfferAmount)} WETH` },
               pattern: {
                 value: /^[0-9]*\.?[0-9]+$/,
                 message: 'Invalid amount format',
               },
             })}
-            disabled={!canCreateOffer}
+            disabled={!props.canCreateOffer}
           />
           {errors.amount && <p className={styles['error-message']}>{errors.amount.message}</p>}
         </div>
@@ -60,14 +66,15 @@ export function CreateOffer({
             {...register('validUntil', {
               required: 'Valid until date is required',
             })}
-            disabled={!canCreateOffer}
+            disabled={!props.canCreateOffer}
           />
           {errors.validUntil && <p className={styles['error-message']}>{errors.validUntil.message}</p>}
         </div>
-
-        <button type="submit" className={styles['submit-button']} disabled={!canCreateOffer}>
-          Submit Offer
-        </button>
+        <div className={styles['actions']}>
+          <button type="submit" className={styles['submit-button']} disabled={!props.canCreateOffer}>
+            Submit Offer
+          </button>
+        </div>
       </form>
     </div>
   );

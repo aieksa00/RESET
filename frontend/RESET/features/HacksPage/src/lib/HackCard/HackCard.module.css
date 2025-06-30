@@ -1,5 +1,6 @@
 .hack-card {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   border: 1px solid #121217;
   border-radius: 8px;
   padding: 16px;
@@ -7,6 +8,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   background-color: #24242e;
+  width: 450px;
 }
 
 .hack-card:hover {
@@ -14,25 +16,30 @@
   transform: scale(1.05);
 }
 
+.hack-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
 .status-label {
-  position: absolute;
-  top: 16px;
-  right: 16px;
   padding: 4px 12px;
   border-radius: 4px;
   font-size: 12px;
   font-weight: bold;
   text-transform: uppercase;
+  margin-left: 8px;
+  margin-bottom: 8px;
 }
 
 .active {
-  background-color: #6e00db;
-  color: #dddde3;
+  background-color: #4caf50;
+  color: #ffffff;
 }
 
 .resolved {
-  background-color: #4CAF50;
-  color: #ffffff;
+  background-color: #6e00db;
+  color: #dddde3;
 }
 
 .hack-item {
@@ -53,7 +60,7 @@
   display: flex;
   justify-content: center;
   gap: 16px;
-  margin-top: 16px;
+  margin-top: auto;
 }
 
 .accept-button {

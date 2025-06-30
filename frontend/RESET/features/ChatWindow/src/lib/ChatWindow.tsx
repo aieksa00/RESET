@@ -8,12 +8,23 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ id, title }: ChatWindowProps) {
-  const { chatWindows, closeChat, updatePosition } = useChatWindows();
-  const chatWindow = chatWindows.get(id);
-
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const dialogRef = useRef<HTMLDivElement>(null);
+
+  const { chatWindows, closeChat, updatePosition } = useChatWindows();
+  const chatWindow = chatWindows.get(id);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (dialogRef.current && e.target === dialogRef.current.querySelector(`.${styles['chat-header']}`)) {
@@ -45,17 +56,6 @@ export function ChatWindow({ id, title }: ChatWindowProps) {
     setIsDragging(false);
   };
 
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging]);
-
   return (
     <div
       ref={dialogRef}
@@ -74,7 +74,9 @@ export function ChatWindow({ id, title }: ChatWindowProps) {
           ×
         </button>
       </div>
-      <div className={styles['chat-content']}>{/* Chat content will go here */}</div>
+      <div className={styles['chat-content']}>
+        
+      </div>
     </div>
   );
 }

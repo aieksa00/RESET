@@ -7,7 +7,6 @@ import { shortenAddress } from '../HacksService/HacksService';
 import { useNavigate } from 'react-router-dom';
 import { useChatWindows } from '@providers';
 
-
 export function HackCard({ hack }: { hack: HackDto }) {
   const [canSendMessage, setCanSendMessage] = useState<boolean>(false);
 
@@ -36,17 +35,19 @@ export function HackCard({ hack }: { hack: HackDto }) {
   };
 
   const handleSendMessage = () => {
-    openChat(hack.id);
+    openChat(hack.id, hack.protocolName);
   };
 
   return (
     <div className={styles['hack-card']}>
-      <div className={`${styles['status-label']} ${hack.status === 0 ? styles['active'] : styles['resolved']}`}>
-        {hack.status === 0 ? 'Active' : 'Resolved'}
-      </div>
-      <div className={styles['hack-item']}>
-        <span className={styles['label']}>Protocol Name:</span>
-        <span className={styles['value']}>{hack.protocolName}</span>
+      <div className={styles['hack-card-header']}>
+        <div className={styles['hack-item']}>
+          <span className={styles['label']}>Protocol Name:</span>
+          <span className={styles['value']}>{hack.protocolName}</span>
+        </div>
+        <div className={`${styles['status-label']} ${hack.status === 0 ? styles['active'] : styles['resolved']}`}>
+          {hack.status === 0 ? 'Active' : 'Resolved'}
+        </div>
       </div>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Hacked Address:</span>

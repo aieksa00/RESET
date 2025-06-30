@@ -10,19 +10,14 @@
       { "name": "_initialOfferAmount", "type": "uint256", "internalType": "uint256" },
       { "name": "_initialOfferValidity", "type": "uint256", "internalType": "uint256" },
       { "name": "_owner", "type": "address", "internalType": "address" },
-      { "name": "_weth", "type": "address", "internalType": "address" }
+      { "name": "_weth", "type": "address", "internalType": "address" },
+      { "name": "_incidentId", "type": "uint256", "internalType": "uint256" },
+      { "name": "_eventEmitter", "type": "address", "internalType": "address" }
     ],
     "stateMutability": "nonpayable"
   },
   { "type": "fallback", "stateMutability": "payable" },
   { "type": "receive", "stateMutability": "payable" },
-  {
-    "type": "function",
-    "name": "RejectOffer",
-    "inputs": [{ "name": "_offerId", "type": "uint256", "internalType": "uint256" }],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
   {
     "type": "function",
     "name": "acceptOffer",
@@ -33,9 +28,49 @@
   { "type": "function", "name": "acceptOwnership", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
   {
     "type": "function",
+    "name": "eventEmitter",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "contract IEventEmitter" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "exploitedAddress",
     "inputs": [],
     "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "feeCalculator",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "contract IFeeCalculator" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getHackerAddress",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getOffer",
+    "inputs": [{ "name": "_offerId", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [
+      { "name": "", "type": "uint8", "internalType": "uint8" },
+      { "name": "", "type": "uint256", "internalType": "uint256" },
+      { "name": "", "type": "uint256", "internalType": "uint256" },
+      { "name": "", "type": "uint8", "internalType": "uint8" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getStatus",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint8", "internalType": "uint8" }],
     "stateMutability": "view"
   },
   {
@@ -50,6 +85,13 @@
     "name": "hackerAddress",
     "inputs": [],
     "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "incidentId",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
   },
   {
@@ -101,6 +143,13 @@
     "inputs": [],
     "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "rejectOffer",
+    "inputs": [{ "name": "_offerId", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   { "type": "function", "name": "renounceOwnership", "inputs": [], "outputs": [], "stateMutability": "nonpayable" },
   {

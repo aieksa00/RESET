@@ -34,3 +34,7 @@ coverage/
 # Vite and Vitest
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
+
+# Prettier 
+.prettierignore
+.prettier

@@ -21,6 +21,6 @@ export interface RequestHackDto {
   hackerAddress: string;
   transactionHash: string;
 
-  initialOfferAmount: string;
+  initialOfferAmount: number;
   initialOfferValidity: Date;
 }

@@ -2,13 +2,14 @@ import React, { createContext, useContext, useState } from 'react';
 
 interface ChatWindow {
   id: string;
+  protocolName: string;
   isOpen: boolean;
   position: { x: number; y: number };
 }
 
 interface ChatWindowContextType {
   chatWindows: Map<string, ChatWindow>;
-  openChat: (id: string) => void;
+  openChat: (id: string, name: string) => void;
   closeChat: (id: string) => void;
   updatePosition: (id: string, position: { x: number; y: number }) => void;
 }
@@ -18,13 +19,14 @@ const ChatWindowContext = createContext<ChatWindowContextType | undefined>(undef
 export function ChatWindowProvider({ children }: { children: React.ReactNode }) {
   const [chatWindows, setChatWindows] = useState<Map<string, ChatWindow>>(new Map());
 
-  const openChat = (id: string) => {
+  const openChat = (id: string, name: string) => {
     setChatWindows((current) => {
       const newWindows = new Map(current);
       newWindows.set(id, {
         id,
+        protocolName: name,
         isOpen: true,
-        position: { x: window.innerWidth - 482, y: 32 + chatWindows.size * 40 },
+        position: { x: window.innerWidth - 482, y: 32 },
       });
       return newWindows;
     });
