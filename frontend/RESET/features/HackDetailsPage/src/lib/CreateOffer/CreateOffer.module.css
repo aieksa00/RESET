@@ -1,6 +1,7 @@
 .offer-form {
   display: flex;
   flex-direction: column;
+  height: fit-content;
   gap: 16px;
   border: 1px solid #121217;
   border-radius: 8px;
@@ -8,12 +9,6 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   background-color: #24242e;
-}
-
-.offer-form fieldset {
-  border: none; /* Remove the default border */
-  margin: 0; /* Remove default margin */
-  padding: 0; /* Remove default padding */
 }
 
 .form-group {
@@ -43,6 +38,12 @@
   color: #ff4500;
   font-size: 14px;
   margin-top: 4px;
+}
+
+.actions {
+  display: flex;
+  justify-content: end;
+  margin-top: 8px;
 }
 
 .submit-button {

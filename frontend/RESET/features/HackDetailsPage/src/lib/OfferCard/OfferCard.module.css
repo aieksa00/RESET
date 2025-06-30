@@ -83,8 +83,39 @@
   background-color: #c0c0c8;
 }
 
-.reject:disabled {
+.reject-button:disabled {
   background-color: #b0b0b8;
   color: #4a007a;
   cursor: not-allowed;
+}
+
+.offer-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.status-label {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-left: 8px;
+  margin-bottom: 8px;
+}
+
+.active {
+  background-color: #4CAF50;
+  color: #dddde3;
+}
+
+.accepted {
+  background-color: #6e00db;
+  color: #ffffff;
+}
+
+.rejected {
+  background-color: #f44336;
+  color: #ffffff;
 }

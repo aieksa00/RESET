@@ -3,7 +3,11 @@ import { gql } from 'graphql-request';
 export function OfferQuery(incident: string): string {
   return gql`
     {
-      offerEvents(where: { incident: "${incident}" }) {
+      offerEvents(
+        where: { incident: "${incident}" }
+        orderBy: eventType
+        orderDirection: asc
+      ) {
         id
         incident
         offerId
@@ -19,7 +23,7 @@ export function OfferQuery(incident: string): string {
 
 export const HacksQuery = gql`
   {
-    incidentApproveds {
+    incidentEvents {
       id
       requestId
       incidentAddress
@@ -31,6 +35,7 @@ export const HacksQuery = gql`
       initialOfferAmount
       initialOfferValidity
       creator
+      status
     }
   }
 `;

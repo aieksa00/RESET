@@ -3,7 +3,7 @@
     "type": "constructor",
     "inputs": [
       { "name": "_weth", "type": "address", "internalType": "address" },
-      { "name": "_fee", "type": "uint256", "internalType": "uint256" }
+      { "name": "_feeCalculator", "type": "address", "internalType": "address" }
     ],
     "stateMutability": "nonpayable"
   },
@@ -19,45 +19,16 @@
   },
   {
     "type": "function",
-    "name": "emitNewOffer",
-    "inputs": [
-      { "name": "_incident", "type": "address", "internalType": "address" },
-      { "name": "_offerId", "type": "uint256", "internalType": "uint256" },
-      { "name": "_proposer", "type": "uint8", "internalType": "uint8" },
-      { "name": "_returnAmount", "type": "uint256", "internalType": "uint256" },
-      { "name": "_validUntil", "type": "uint256", "internalType": "uint256" }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "emitOfferAccepted",
-    "inputs": [
-      { "name": "_incident", "type": "address", "internalType": "address" },
-      { "name": "_protocolName", "type": "string", "internalType": "string" },
-      { "name": "_returnedAmount", "type": "uint256", "internalType": "uint256" }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "emitOfferRejected",
-    "inputs": [
-      { "name": "_incident", "type": "address", "internalType": "address" },
-      { "name": "_protocolName", "type": "string", "internalType": "string" },
-      { "name": "_returnedAmount", "type": "uint256", "internalType": "uint256" },
-      { "name": "_proposer", "type": "uint8", "internalType": "uint8" }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "fee",
+    "name": "eventEmitter",
     "inputs": [],
-    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [{ "name": "", "type": "address", "internalType": "contract IEventEmitter" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "feeCalculator",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
     "stateMutability": "view"
   },
   {
@@ -69,9 +40,23 @@
   },
   {
     "type": "function",
-    "name": "getFee",
+    "name": "getEventEmitter",
     "inputs": [],
-    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getIncident",
+    "inputs": [{ "name": "_incidentId", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getMailbox",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
     "stateMutability": "view"
   },
   {
@@ -114,6 +99,20 @@
   },
   {
     "type": "function",
+    "name": "isIncidentAddress",
+    "inputs": [{ "name": "_incidentAddress", "type": "address", "internalType": "address" }],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "mailbox",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "owner",
     "inputs": [],
     "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
@@ -144,6 +143,20 @@
   },
   {
     "type": "function",
+    "name": "setEventEmitter",
+    "inputs": [{ "name": "_eventEmitter", "type": "address", "internalType": "address" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setMailbox",
+    "inputs": [{ "name": "_mailbox", "type": "address", "internalType": "address" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "transferOwnership",
     "inputs": [{ "name": "newOwner", "type": "address", "internalType": "address" }],
     "outputs": [],
@@ -165,65 +178,6 @@
   },
   {
     "type": "event",
-    "name": "IncidentApproved",
-    "inputs": [
-      { "name": "requestId", "type": "uint256", "indexed": true, "internalType": "uint256" },
-      { "name": "incidentAddress", "type": "address", "indexed": true, "internalType": "address" },
-      { "name": "protocolName", "type": "string", "indexed": true, "internalType": "string" },
-      { "name": "hackedAmount", "type": "uint256", "indexed": false, "internalType": "uint256" },
-      { "name": "exploitedAddress", "type": "address", "indexed": false, "internalType": "address" },
-      { "name": "hackerAddress", "type": "address", "indexed": false, "internalType": "address" },
-      { "name": "txHash", "type": "bytes32", "indexed": false, "internalType": "bytes32" },
-      { "name": "initialOfferAmount", "type": "uint256", "indexed": false, "internalType": "uint256" },
-      { "name": "initialOfferValidity", "type": "uint256", "indexed": false, "internalType": "uint256" },
-      { "name": "creator", "type": "address", "indexed": false, "internalType": "address" }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "IncidentRequested",
-    "inputs": [
-      { "name": "requestId", "type": "uint256", "indexed": true, "internalType": "uint256" },
-      { "name": "creator", "type": "address", "indexed": true, "internalType": "address" }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "NewOffer",
-    "inputs": [
-      { "name": "incident", "type": "address", "indexed": true, "internalType": "address" },
-      { "name": "offerId", "type": "uint256", "indexed": true, "internalType": "uint256" },
-      { "name": "proposer", "type": "uint8", "indexed": true, "internalType": "uint8" },
-      { "name": "returnAmount", "type": "uint256", "indexed": false, "internalType": "uint256" },
-      { "name": "validUntil", "type": "uint256", "indexed": false, "internalType": "uint256" }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "OfferAccepted",
-    "inputs": [
-      { "name": "incident", "type": "address", "indexed": true, "internalType": "address" },
-      { "name": "protocolName", "type": "string", "indexed": true, "internalType": "string" },
-      { "name": "returnedAmount", "type": "uint256", "indexed": true, "internalType": "uint256" }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "OfferRejected",
-    "inputs": [
-      { "name": "incident", "type": "address", "indexed": true, "internalType": "address" },
-      { "name": "protocolName", "type": "string", "indexed": true, "internalType": "string" },
-      { "name": "returnedAmount", "type": "uint256", "indexed": false, "internalType": "uint256" },
-      { "name": "proposer", "type": "uint8", "indexed": false, "internalType": "uint8" }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "OwnershipTransferStarted",
     "inputs": [
       { "name": "previousOwner", "type": "address", "indexed": true, "internalType": "address" },
@@ -240,9 +194,11 @@
     ],
     "anonymous": false
   },
+  { "type": "error", "name": "CantBeZero", "inputs": [] },
+  { "type": "error", "name": "EventEmitterAlreadySet", "inputs": [] },
   { "type": "error", "name": "IncidentAlreadyApproved", "inputs": [] },
   { "type": "error", "name": "IncidentDoesNotExist", "inputs": [] },
-  { "type": "error", "name": "OnlyIncidentCanCall", "inputs": [] },
+  { "type": "error", "name": "MailboxAlreadySet", "inputs": [] },
   { "type": "error", "name": "OwnableInvalidOwner", "inputs": [{ "name": "owner", "type": "address", "internalType": "address" }] },
   { "type": "error", "name": "OwnableUnauthorizedAccount", "inputs": [{ "name": "account", "type": "address", "internalType": "address" }] },
   { "type": "error", "name": "ReentrancyGuardReentrantCall", "inputs": [] },

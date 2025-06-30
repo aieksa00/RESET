@@ -1,6 +1,5 @@
 import styles from './HacksPage.module.css';
 
-import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { request } from 'graphql-request';
@@ -9,30 +8,16 @@ import { HackDto, GraphQueryUrl, GraphQueryAPIKey, HacksQuery } from 'models';
 import { HackCard } from '../HackCard/HackCard';
 
 export function HacksPage() {
-  const [hacks, setHacks] = useState<HackDto[]>([]);
-  const [filteredHacks, setFilteredHacks] = useState<HackDto[]>([]);
-
-  const { data, status } = useQuery({
-    queryKey: ['data'],
-    async queryFn(): Promise<{ incidentApproveds: HackDto[] }> {
-      return await request(
-        GraphQueryUrl,
-        HacksQuery,
-        {},
-        { Authorization: `Bearer ${GraphQueryAPIKey}` }
-      );
+  const { data, status, refetch } = useQuery({
+    queryKey: ['incidentEvents'],
+    async queryFn(): Promise<{ incidentEvents: HackDto[] }> {
+      return await request(GraphQueryUrl, HacksQuery, {}, { Authorization: `Bearer ${GraphQueryAPIKey}` });
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    retry: 2,
+    retryDelay: 1000,
   });
-
-  // Use useEffect to update hacks and filteredHacks when data is fetched
-  useEffect(() => {
-    if (status === 'success' && data) {
-      setHacks(data.incidentApproveds || []);
-      setFilteredHacks(data.incidentApproveds || []);
-    }
-  }, [data, status]);
-
-  console.log('GraphQL Data:', data);
 
   const {
     register,
@@ -44,23 +29,54 @@ export function HacksPage() {
     },
   });
 
-  const onSubmit = (data: { searchTerm: string }) => {
-    const term = data.searchTerm.toLowerCase();
-    const filtered = hacks.filter((hack) =>
-      hack.protocolName.toLowerCase().includes(term)
+  const onSubmit = (searchData: { searchTerm: string }) => {
+    const term = searchData.searchTerm.toLowerCase();
+  };
+
+  const renderHacksList = () => {
+    if (status === 'pending') {
+      return (
+        <div className={styles['loading-container']}>
+          <div className={styles['spinner']}></div>
+          <h3>Loading hacks...</h3>
+        </div>
+      );
+    }
+
+    if (status === 'error') {
+      return (
+        <div className={styles['error-container']}>
+          <h3>Error loading hacks...</h3>
+        </div>
+      );
+    }
+
+    if (!data.incidentEvents.length && status === 'success') {
+      return (
+        <div className={styles['no-hacks-container']}>
+          <div className={styles['no-hacks']}>
+            <h3>No hacks found</h3>
+          </div>
+          <button className={styles['refresh-button']} onClick={() => refetch()} aria-label="Refresh hacks">
+            ↻
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles['hack-list']}>
+        {data.incidentEvents.map((hack, index) => (
+          <HackCard key={index} hack={hack} />
+        ))}
+      </div>
     );
-    setFilteredHacks(filtered);
-    console.log(`Searching for: ${data.searchTerm}`);
   };
 
   return (
-    <div className={styles['container']}>
+    <>
       <form onSubmit={handleSubmit(onSubmit)} className={styles['form']}>
-        <div
-          className={`${styles['input-container']} ${
-            errors.searchTerm ? styles['error-border'] : ''
-          }`}
-        >
+        <div className={`${styles['input-container']} ${errors.searchTerm ? styles['error-border'] : ''}`}>
           <input
             type="text"
             id="searchTerm"
@@ -74,22 +90,14 @@ export function HacksPage() {
             })}
             className={styles['search-bar']}
           />
-          {errors.searchTerm && (
-            <p className={styles['error-message']}>
-              {errors.searchTerm.message}
-            </p>
-          )}
+          {errors.searchTerm && <p className={styles['error-message']}>{errors.searchTerm.message}</p>}
         </div>
         <button type="submit" className={styles['search-button']}>
           Search
         </button>
       </form>
-      <div className={styles['hack-list']}>
-        {filteredHacks.map((hack, index) => (
-          <HackCard key={index} hack={hack} />
-        ))}
-      </div>
-    </div>
+      {renderHacksList()}
+    </>
   );
 }
 

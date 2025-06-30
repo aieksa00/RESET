@@ -12,38 +12,83 @@ import CreateOffer from './CreateOffer/CreateOffer';
 import OfferCard from './OfferCard/OfferCard';
 
 export function HackDetailsPage() {
-  const [offers, setOffers] = useState<OfferDto[]>([]);
+  const [canCreateOffer, setCanCreateOffer] = useState<boolean>(false);
+  const [isHacker, setIsHacker] = useState<boolean>(false);
 
   const location = useLocation();
   const hack = location.state?.hack as HackDto;
 
   const { address } = useAccount();
-  const [canCreateOffer, setCanCreateOffer] = useState<boolean>(false);
 
   const { data, status } = useQuery({
-    queryKey: ['data'],
+    queryKey: ['offers', hack.incidentAddress], // Add specific query key
     async queryFn(): Promise<{ offerEvents: OfferDto[] }> {
       return await request(GraphQueryUrl, OfferQuery(hack.incidentAddress), {}, { Authorization: `Bearer ${GraphQueryAPIKey}` });
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    enabled: !!hack.incidentAddress,
+    retry: 2,
+    retryDelay: 1000,
   });
 
-  useEffect(() => {
-    if (status === 'success' && data) {
-      setOffers(data.offerEvents || []);
-    }
-  }, [data, status]);
+  const sortOffers = (offers: OfferDto[]) => {
+    const customOrder = { 1: 0, 2: 1, 0: 2 }; // Priority: Accepted(1) -> Rejected(2) -> Active(0)
+    
+    return [...offers].sort((a, b) => 
+      (customOrder[a.eventType as keyof typeof customOrder] || 0) - 
+      (customOrder[b.eventType as keyof typeof customOrder] || 0)
+    );
+  };
+
+  const sortedOffers = data?.offerEvents ? sortOffers(data.offerEvents) : [];
 
   useEffect(() => {
     const normalizedAddress = address ? getAddress(address).toLowerCase() : '';
     const normalizedCreator = getAddress(hack.creator).toLowerCase();
     const normalizedHackerAddress = getAddress(hack.hackerAddress).toLowerCase();
 
-    if (normalizedAddress === normalizedCreator || normalizedAddress === normalizedHackerAddress) {
-      setCanCreateOffer(true);
-    } else {
-      setCanCreateOffer(false);
-    }
+    setCanCreateOffer(normalizedAddress === normalizedCreator || normalizedAddress === normalizedHackerAddress);
+    setIsHacker(normalizedAddress === normalizedHackerAddress);
   }, [hack.creator, hack.hackerAddress, address]);
+
+  const renderOffersSection = () => {
+    if (status === 'pending') {
+      return (
+        <div className={styles['loading-container']}>
+          <div className={styles['spinner']}></div>
+          <h3>Loading offers...</h3>
+        </div>
+      );
+    }
+
+    if (status === 'error') {
+      return (
+        <div className={styles['error-container']}>
+          <h3>Error loading offers...</h3>
+        </div>
+      );
+    }
+
+    if (!data.offerEvents.length && status === 'success') {
+      return (
+        <div className={styles['no-offers']}>
+          <h3>No offers available</h3>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <h1 className={styles['offers-title']}>Offers</h1>
+        <div className={styles['offers-section']}>
+          {sortedOffers.map((offer, index) => (
+            <OfferCard key={index} offer={offer} hackerAddress={hack.hackerAddress} hackStatus={hack.status} creatorAddress={hack.creator} />
+          ))}
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className={styles['hack-details-page']}>
@@ -75,13 +120,9 @@ export function HackDetailsPage() {
             <span className={styles['value']}>{hack.hackerAddress}</span>
           </div>
         </div>
-        <CreateOffer incidentAddress={hack.incidentAddress} canCreateOffer={canCreateOffer} maxOfferAmount={hack.hackedAmount} />
+        <CreateOffer incidentAddress={hack.incidentAddress} canCreateOffer={canCreateOffer} isHacker={isHacker} maxOfferAmount={hack.hackedAmount} />
       </div>
-      <div className={styles['offers-section']}>
-        {offers.map((offer, index) => (
-          <OfferCard key={index} offer={offer} />
-        ))}
-      </div>
+      {renderOffersSection()}
     </div>
   );
 }

@@ -3,13 +3,13 @@ export interface OfferDto {
   incident: string;
   offerId: number;
   proposer: number;
-  returnAmount: number;
+  returnAmount: bigint;
   validUntil: number;
   protocolName: string;
   eventType: number;
 }
 
 export interface CreateOfferFormData {
-  amount: string; // Amount in ETH
-  validUntil: Date; // Valid until (date or timestamp)
+  amount: number;
+  validUntil: Date;
 }

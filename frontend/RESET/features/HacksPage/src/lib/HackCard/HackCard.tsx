@@ -5,11 +5,13 @@ import { HackDto, RESETRoutes } from 'models';
 import { useAccount } from 'wagmi';
 import { shortenAddress } from '../HacksService/HacksService';
 import { useNavigate } from 'react-router-dom';
+import { useChatWindows } from '@providers';
 
 export function HackCard({ hack }: { hack: HackDto }) {
   const [canSendMessage, setCanSendMessage] = useState<boolean>(false);
 
-  const { address } = useAccount(); // Get wallet address and connection status
+  const { address } = useAccount();
+  const { openChat } = useChatWindows();
 
   const navigation = useNavigate();
 
@@ -19,7 +21,7 @@ export function HackCard({ hack }: { hack: HackDto }) {
     const normalizedHackerAddress = getAddress(hack.hackerAddress).toLowerCase();
 
     if (normalizedAddress === normalizedCreator || normalizedAddress === normalizedHackerAddress) {
-      setCanSendMessage(true); 
+      setCanSendMessage(true);
     } else {
       setCanSendMessage(false);
     }
@@ -33,14 +35,19 @@ export function HackCard({ hack }: { hack: HackDto }) {
   };
 
   const handleSendMessage = () => {
-    console.log('Sending message...');
+    openChat(hack.id, hack.protocolName);
   };
 
   return (
     <div className={styles['hack-card']}>
-      <div className={styles['hack-item']}>
-        <span className={styles['label']}>Protocol Name:</span>
-        <span className={styles['value']}>{hack.protocolName}</span>
+      <div className={styles['hack-card-header']}>
+        <div className={styles['hack-item']}>
+          <span className={styles['label']}>Protocol Name:</span>
+          <span className={styles['value']}>{hack.protocolName}</span>
+        </div>
+        <div className={`${styles['status-label']} ${hack.status === 0 ? styles['active'] : styles['resolved']}`}>
+          {hack.status === 0 ? 'Active' : 'Resolved'}
+        </div>
       </div>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Hacked Address:</span>
@@ -53,7 +60,9 @@ export function HackCard({ hack }: { hack: HackDto }) {
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Transaction hash:</span>
         <span className={styles['value']}>
-        <a href={`https://sepolia.etherscan.io/tx/${hack.txHash}`} target="_blank" rel="noopener noreferrer">{shortenAddress(hack.txHash)}</a>
+          <a href={`https://sepolia.etherscan.io/tx/${hack.txHash}`} target="_blank" rel="noopener noreferrer">
+            {shortenAddress(hack.txHash)}
+          </a>
         </span>
       </div>
       <div className={styles['hack-item']}>
@@ -63,12 +72,10 @@ export function HackCard({ hack }: { hack: HackDto }) {
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Initial Return Amount:</span>
         <span className={styles['value']}>{formatEther(hack.initialOfferAmount)} WETH</span>
-      </div>     
+      </div>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Initial Offer Validty:</span>
-        <span className={styles['value']}>
-          {new Date(hack.initialOfferValidity*1000).toUTCString()}
-        </span>
+        <span className={styles['value']}>{new Date(hack.initialOfferValidity * 1000).toUTCString()}</span>
       </div>
       <div className={styles['hack-item']}>
         <span className={styles['label']}>Protocol Representative:</span>
@@ -78,11 +85,7 @@ export function HackCard({ hack }: { hack: HackDto }) {
         <button className={styles['accept-button']} onClick={handleOfferDetails}>
           Offer details
         </button>
-        <button
-          className={styles['send-msg-button']}
-          onClick={handleSendMessage}
-          disabled={!canSendMessage}
-        >
+        <button className={styles['send-msg-button']} onClick={handleSendMessage} disabled={!canSendMessage}>
           Send message
         </button>
       </div>
