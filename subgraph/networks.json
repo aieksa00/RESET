@@ -1,11 +1,8 @@
 {
   "sepolia": {
-    "Reset": {
-      "address": "0xFd0094Dc05B6f93e3Dcb08Ef794d2fcAdcCE5C07",
-      "startBlock": 8656372
-    },
-    "Mailbox": {
-      "address": "0xd0df86242833cfDe00acd60Ae419f11C919E1611"
+    "EventEmitter": {
+      "address": "0xadE485363904DD40BBF7b49609B1070e42525124",
+      "startBlock": 8663828
     }
   }
 }

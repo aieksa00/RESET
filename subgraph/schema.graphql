@@ -1,5 +1,5 @@
-type IncidentApproved @entity(immutable: true) {
-  id: Bytes!
+type IncidentEvent @entity(immutable: false) {
+  id: String!
   requestId: BigInt! # uint256
   incidentAddress: Bytes! # address
   protocolName: String! # string
@@ -10,6 +10,7 @@ type IncidentApproved @entity(immutable: true) {
   initialOfferAmount: BigInt! # uint256
   initialOfferValidity: BigInt! # uint256
   creator: Bytes! # address
+  status: Int! # uint8
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -24,8 +25,29 @@ type IncidentRequested @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type OfferEvent @entity(immutable: true) {
+type MailboxPublicKeyRegistered @entity(immutable: true) {
   id: Bytes!
+  user: Bytes! # address
+  publicKey: Bytes! # bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MessageSent @entity(immutable: true) {
+  id: Bytes!
+  incidentAddress: Bytes! # address
+  from: Bytes! # address
+  to: Bytes! # address
+  encryptedMessage: Bytes! # bytes
+  timestamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OfferEvent @entity(immutable: false) {
+  id: String!
   incident: Bytes! # address
   offerId: BigInt! # uint256
   proposer: Int! # uint8
@@ -38,49 +60,13 @@ type OfferEvent @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type OwnershipTransferStarted @entity(immutable: true) {
-  id: Bytes!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OwnershipTransferred @entity(immutable: true) {
-  id: Bytes!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-type MessageSent @entity(immutable: true) {
-  id: Bytes!
-  incidentAddress: Bytes! # address
-  from: Bytes! # address
-  to: Bytes! # address
-  encryptedMessage: Bytes! # bytes
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type PublicKeyRegistered @entity(immutable: true) {
-  id: Bytes!
-  user: Bytes! # address
-  publicKey: Bytes! # bytes
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type SignedContractEvent @entity(immutable: true) {
   id: Bytes!
   incidentAddress: Bytes! # address
   creator: Bytes! # address
   hacker: Bytes! # address
   contractData: Bytes! # bytes
+  timestamp: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

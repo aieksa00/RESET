@@ -6,6 +6,10 @@ interface IReset {
 
     function getMailbox() external view returns (address);
 
+    function setEventEmitter(address _eventEmitter) external;
+
+    function getEventEmitter() external view returns (address);
+
     function requestIncident(
         string memory _protocolName,
         address _exploitedAddress,
@@ -22,36 +26,9 @@ interface IReset {
 
     function getIncident(uint256 _incidentId) external view returns (address);
 
-    function emitNewOffer(
-        address _incident,
-        uint256 _offerId,
-        uint8 _proposer,
-        uint256 _returnAmount,
-        uint256 _validUntil,
-        string memory _protocolName
-    ) external;
-
-    function emitOfferAccepted(
-        address _incident,
-        uint256 _offerId,
-        uint8 _proposer,
-        uint256 _returnAmount,
-        uint256 _validUntil,
-        string memory _protocolName
-    ) external;
-
-    function emitOfferRejected(
-        address _incident,
-        uint256 _offerId,
-        uint8 _proposer,
-        uint256 _returnAmount,
-        uint256 _validUntil,
-        string memory _protocolName
-    ) external;
-
-    function getFee() external view returns (uint256);
-
     function withdraw(address _receiver) external;
 
     function isIncidentAddress(address _incidentAddress) external view returns (bool);
+
+    function feeCalculator() external view returns (address);
 }

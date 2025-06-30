@@ -1,14 +1,15 @@
 import { newMockEvent } from "matchstick-as"
 import { ethereum, BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
 import {
-  IncidentApproved,
+  IncidentEvent,
   IncidentRequested,
+  MailboxPublicKeyRegistered,
+  MessageSent,
   OfferEvent,
-  OwnershipTransferStarted,
-  OwnershipTransferred
-} from "../generated/Reset/Reset"
+  SignedContractEvent
+} from "../generated/EventEmitter/EventEmitter"
 
-export function createIncidentApprovedEvent(
+export function createIncidentEventEvent(
   requestId: BigInt,
   incidentAddress: Address,
   protocolName: string,
@@ -18,68 +19,75 @@ export function createIncidentApprovedEvent(
   txHash: Bytes,
   initialOfferAmount: BigInt,
   initialOfferValidity: BigInt,
-  creator: Address
-): IncidentApproved {
-  let incidentApprovedEvent = changetype<IncidentApproved>(newMockEvent())
+  creator: Address,
+  status: i32
+): IncidentEvent {
+  let incidentEventEvent = changetype<IncidentEvent>(newMockEvent())
 
-  incidentApprovedEvent.parameters = new Array()
+  incidentEventEvent.parameters = new Array()
 
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam(
       "requestId",
       ethereum.Value.fromUnsignedBigInt(requestId)
     )
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam(
       "incidentAddress",
       ethereum.Value.fromAddress(incidentAddress)
     )
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam(
       "protocolName",
       ethereum.Value.fromString(protocolName)
     )
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam(
       "hackedAmount",
       ethereum.Value.fromUnsignedBigInt(hackedAmount)
     )
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam(
       "exploitedAddress",
       ethereum.Value.fromAddress(exploitedAddress)
     )
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam(
       "hackerAddress",
       ethereum.Value.fromAddress(hackerAddress)
     )
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam("txHash", ethereum.Value.fromFixedBytes(txHash))
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam(
       "initialOfferAmount",
       ethereum.Value.fromUnsignedBigInt(initialOfferAmount)
     )
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam(
       "initialOfferValidity",
       ethereum.Value.fromUnsignedBigInt(initialOfferValidity)
     )
   )
-  incidentApprovedEvent.parameters.push(
+  incidentEventEvent.parameters.push(
     new ethereum.EventParam("creator", ethereum.Value.fromAddress(creator))
   )
+  incidentEventEvent.parameters.push(
+    new ethereum.EventParam(
+      "status",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(status))
+    )
+  )
 
-  return incidentApprovedEvent
+  return incidentEventEvent
 }
 
 export function createIncidentRequestedEvent(
@@ -101,6 +109,64 @@ export function createIncidentRequestedEvent(
   )
 
   return incidentRequestedEvent
+}
+
+export function createMailboxPublicKeyRegisteredEvent(
+  user: Address,
+  publicKey: Bytes
+): MailboxPublicKeyRegistered {
+  let mailboxPublicKeyRegisteredEvent =
+    changetype<MailboxPublicKeyRegistered>(newMockEvent())
+
+  mailboxPublicKeyRegisteredEvent.parameters = new Array()
+
+  mailboxPublicKeyRegisteredEvent.parameters.push(
+    new ethereum.EventParam("user", ethereum.Value.fromAddress(user))
+  )
+  mailboxPublicKeyRegisteredEvent.parameters.push(
+    new ethereum.EventParam("publicKey", ethereum.Value.fromBytes(publicKey))
+  )
+
+  return mailboxPublicKeyRegisteredEvent
+}
+
+export function createMessageSentEvent(
+  incidentAddress: Address,
+  from: Address,
+  to: Address,
+  encryptedMessage: Bytes,
+  timestamp: BigInt
+): MessageSent {
+  let messageSentEvent = changetype<MessageSent>(newMockEvent())
+
+  messageSentEvent.parameters = new Array()
+
+  messageSentEvent.parameters.push(
+    new ethereum.EventParam(
+      "incidentAddress",
+      ethereum.Value.fromAddress(incidentAddress)
+    )
+  )
+  messageSentEvent.parameters.push(
+    new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
+  )
+  messageSentEvent.parameters.push(
+    new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
+  )
+  messageSentEvent.parameters.push(
+    new ethereum.EventParam(
+      "encryptedMessage",
+      ethereum.Value.fromBytes(encryptedMessage)
+    )
+  )
+  messageSentEvent.parameters.push(
+    new ethereum.EventParam(
+      "timestamp",
+      ethereum.Value.fromUnsignedBigInt(timestamp)
+    )
+  )
+
+  return messageSentEvent
 }
 
 export function createOfferEventEvent(
@@ -159,46 +225,41 @@ export function createOfferEventEvent(
   return offerEventEvent
 }
 
-export function createOwnershipTransferStartedEvent(
-  previousOwner: Address,
-  newOwner: Address
-): OwnershipTransferStarted {
-  let ownershipTransferStartedEvent =
-    changetype<OwnershipTransferStarted>(newMockEvent())
+export function createSignedContractEventEvent(
+  incidentAddress: Address,
+  creator: Address,
+  hacker: Address,
+  contractData: Bytes,
+  timestamp: BigInt
+): SignedContractEvent {
+  let signedContractEventEvent = changetype<SignedContractEvent>(newMockEvent())
 
-  ownershipTransferStartedEvent.parameters = new Array()
+  signedContractEventEvent.parameters = new Array()
 
-  ownershipTransferStartedEvent.parameters.push(
+  signedContractEventEvent.parameters.push(
     new ethereum.EventParam(
-      "previousOwner",
-      ethereum.Value.fromAddress(previousOwner)
+      "incidentAddress",
+      ethereum.Value.fromAddress(incidentAddress)
     )
   )
-  ownershipTransferStartedEvent.parameters.push(
-    new ethereum.EventParam("newOwner", ethereum.Value.fromAddress(newOwner))
+  signedContractEventEvent.parameters.push(
+    new ethereum.EventParam("creator", ethereum.Value.fromAddress(creator))
   )
-
-  return ownershipTransferStartedEvent
-}
-
-export function createOwnershipTransferredEvent(
-  previousOwner: Address,
-  newOwner: Address
-): OwnershipTransferred {
-  let ownershipTransferredEvent =
-    changetype<OwnershipTransferred>(newMockEvent())
-
-  ownershipTransferredEvent.parameters = new Array()
-
-  ownershipTransferredEvent.parameters.push(
+  signedContractEventEvent.parameters.push(
+    new ethereum.EventParam("hacker", ethereum.Value.fromAddress(hacker))
+  )
+  signedContractEventEvent.parameters.push(
     new ethereum.EventParam(
-      "previousOwner",
-      ethereum.Value.fromAddress(previousOwner)
+      "contractData",
+      ethereum.Value.fromBytes(contractData)
     )
   )
-  ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam("newOwner", ethereum.Value.fromAddress(newOwner))
+  signedContractEventEvent.parameters.push(
+    new ethereum.EventParam(
+      "timestamp",
+      ethereum.Value.fromUnsignedBigInt(timestamp)
+    )
   )
 
-  return ownershipTransferredEvent
+  return signedContractEventEvent
 }

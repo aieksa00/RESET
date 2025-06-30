@@ -6,16 +6,18 @@ import "./Incident.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "./interfaces/IEventEmitter.sol";
+import "./interfaces/IIncident.sol";
 
 contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     error IncidentDoesNotExist();
     error IncidentAlreadyApproved();
-    error OnlyIncidentCanCall();
     error cantOfferMoreThanHackedAmount();
     error CantBeZero();
     error MailboxAlreadySet();
+    error EventEmitterAlreadySet();
 
     struct IncidentRequest {
         string protocolName;
@@ -37,40 +39,13 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     address public weth;
     address public mailbox;
 
-    uint256 public fee; // in bps
+    IEventEmitter public eventEmitter;
 
-    enum OfferEventType { New, Accepted, Rejected }
+    address public feeCalculator;
 
-    event IncidentRequested(uint256 indexed requestId, address indexed creator);
-    event IncidentApproved(uint256 indexed requestId, address indexed incidentAddress, string protocolName, uint256 hackedAmount, address exploitedAddress, address hackerAddress, bytes32 txHash, uint256 initialOfferAmount, uint256 initialOfferValidity, address creator);
-
-    event OfferEvent(
-        address indexed incident,
-        uint256 indexed offerId,
-        uint8 indexed proposer,
-        uint256 returnAmount,
-        uint256 validUntil,
-        string protocolName,
-        OfferEventType eventType
-    );
-
-    modifier onlyIncident() {
-        if (!isIncident[_msgSender()]) {
-            revert OnlyIncidentCanCall();
-        }
-        _;
-    }
-
-    modifier onlyIncidentOrOwner() {
-        if (tx.origin != owner() && !isIncident[_msgSender()]) {
-            revert OnlyIncidentCanCall();
-        }
-        _;
-    }
-
-    constructor(address _weth, uint256 _fee) Ownable(_msgSender()) {
+    constructor(address _weth, address _feeCalculator) Ownable(_msgSender()) {
         weth = _weth;
-        fee = _fee;
+        feeCalculator = _feeCalculator;
     }
 
     function setMailbox(address _mailbox) external onlyOwner {
@@ -89,6 +64,22 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
         return mailbox;
     }
 
+    function setEventEmitter(address _eventEmitter) external onlyOwner {
+        if (address(eventEmitter) != address(0)) {
+            revert EventEmitterAlreadySet();
+        }
+
+        if (_eventEmitter == address(0)) {
+            revert CantBeZero();
+        }
+        
+        eventEmitter = IEventEmitter(_eventEmitter);
+    }
+
+    function getEventEmitter() external view returns (address) {
+        return address(eventEmitter);
+    }
+
     function requestIncident(
         string memory _protocolName,
         address _exploitedAddress,
@@ -97,7 +88,7 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
         bytes32 _txHash,
         uint256 _initialOfferAmount,
         uint256 _initialOfferValidity
-    ) external {
+    ) external nonReentrant {
         if (_initialOfferAmount > _hackedAmount) {
             revert cantOfferMoreThanHackedAmount();
         }
@@ -114,12 +105,12 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
             approved: false
         });
 
-        emit IncidentRequested(incidentRequestCount, _msgSender());
+        eventEmitter.emitIncidentRequested(incidentRequestCount, _msgSender());
 
         incidentRequestCount++;
     }
 
-    function approveIncident(uint256 _requestId) external onlyOwner {
+    function approveIncident(uint256 _requestId) external onlyOwner nonReentrant {
         if (_requestId >= incidentRequestCount) {
             revert IncidentDoesNotExist();
         }
@@ -142,13 +133,50 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
             incidentRequest.initialOfferValidity,
             incidentRequest.creator,
             weth,
-            incidentRequestCount
+            _requestId,
+            address(eventEmitter)
         );
 
         incidents.push(address(incident));
         isIncident[address(incident)] = true;
 
-        emit IncidentApproved(_requestId, address(incident), incidentRequest.protocolName, incidentRequest.hackedAmount, incidentRequest.exploitedAddress, incidentRequest.hackerAddress, incidentRequest.txHash, incidentRequest.initialOfferAmount, incidentRequest.initialOfferValidity, incidentRequest.creator);
+        bytes memory contractData = abi.encodePacked(
+            "Protocol agrees not to take any legal action against the hacker if the incident is resolved and they found common ground."
+        );
+        // solhint-disable-next-line avoid-low-level-calls
+        (bool success, ) = mailbox.call(
+            abi.encodeWithSignature(
+                "signContract(address,bytes)",
+                address(incident),
+                contractData
+            )
+        );
+        require(success, "Mailbox signContract failed");
+
+        uint8 status = IIncident(incident).getStatus();
+
+        eventEmitter.emitIncidentEvent(
+            _requestId,
+            address(incident),
+            incidentRequest.protocolName,
+            incidentRequest.hackedAmount,
+            incidentRequest.exploitedAddress,
+            incidentRequest.hackerAddress,
+            incidentRequest.txHash,
+            incidentRequest.initialOfferAmount,
+            incidentRequest.initialOfferValidity,
+            incidentRequest.creator,
+            status
+        );
+
+        eventEmitter.emitNewOffer(
+            address(incident),
+            0,
+            1, // Proposer.Protocol
+            incidentRequest.initialOfferAmount,
+            incidentRequest.initialOfferValidity,
+            incidentRequest.protocolName
+        );
     }
 
     function getAllIncidents() external view returns (address[] memory) {
@@ -161,67 +189,6 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
         }
 
         return incidents[_incidentId];
-    }
-
-    function emitNewOffer(
-        address _incident,
-        uint256 _offerId,
-        uint8 _proposer,
-        uint256 _returnAmount,
-        uint256 _validUntil,
-        string memory _protocolName
-    ) external onlyIncidentOrOwner {
-        emit OfferEvent(
-            _incident,
-            _offerId,
-            _proposer,
-            _returnAmount,
-            _validUntil,
-            _protocolName,
-            OfferEventType.New
-        );
-    }
-
-    function emitOfferAccepted(
-        address _incident,
-        uint256 _offerId,
-        uint8 _proposer,
-        uint256 _returnAmount,
-        uint256 _validUntil,
-        string memory _protocolName
-    ) external onlyIncident {
-        emit OfferEvent(
-            _incident,
-            _offerId,
-            _proposer,
-            _returnAmount,
-            _validUntil,
-            _protocolName,
-            OfferEventType.Accepted
-        );
-    }
-
-    function emitOfferRejected(
-        address _incident,
-        uint256 _offerId,
-        uint8 _proposer,
-        uint256 _returnAmount,
-        uint256 _validUntil,
-        string memory _protocolName
-    ) external onlyIncident {
-        emit OfferEvent(
-            _incident,
-            _offerId,
-            _proposer,
-            _returnAmount,
-            _validUntil,
-            _protocolName,
-            OfferEventType.Rejected
-        );
-    }
-
-    function getFee() external view returns (uint256) {
-        return fee;
     }
 
      function withdraw(address _receiver) external onlyOwner nonReentrant {

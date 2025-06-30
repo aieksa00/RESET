@@ -1,0 +1,390 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_reset", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "OnlyIncidentCanCall", "type": "error" },
+  { "inputs": [], "name": "OnlyResetCanCall", "type": "error" },
+  { "inputs": [], "name": "OnlyResetOrIncidentCanCall", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "incidentAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "protocolName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "hackedAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "exploitedAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "hackerAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "txHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "initialOfferAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "initialOfferValidity",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "name": "IncidentEvent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "requestId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      }
+    ],
+    "name": "IncidentRequested",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "publicKey",
+        "type": "bytes"
+      }
+    ],
+    "name": "MailboxPublicKeyRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "incidentAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "encryptedMessage",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "MessageSent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "incident",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint8",
+        "name": "proposer",
+        "type": "uint8"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "returnAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "validUntil",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "protocolName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8",
+        "name": "eventType",
+        "type": "uint8"
+      }
+    ],
+    "name": "OfferEvent",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "incidentAddress",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "hacker",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "contractData",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "SignedContractEvent",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_requestId", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "_incidentAddress",
+        "type": "address"
+      },
+      { "internalType": "string", "name": "_protocolName", "type": "string" },
+      { "internalType": "uint256", "name": "_hackedAmount", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "_exploitedAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_hackerAddress",
+        "type": "address"
+      },
+      { "internalType": "bytes32", "name": "_txHash", "type": "bytes32" },
+      {
+        "internalType": "uint256",
+        "name": "_initialOfferAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_initialOfferValidity",
+        "type": "uint256"
+      },
+      { "internalType": "address", "name": "_creator", "type": "address" },
+      { "internalType": "uint8", "name": "_status", "type": "uint8" }
+    ],
+    "name": "emitIncidentEvent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_requestId", "type": "uint256" },
+      { "internalType": "address", "name": "_creator", "type": "address" }
+    ],
+    "name": "emitIncidentRequested",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_user", "type": "address" },
+      { "internalType": "bytes", "name": "_publicKey", "type": "bytes" }
+    ],
+    "name": "emitMailboxPublicKeyRegistered",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_incidentAddress",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "_from", "type": "address" },
+      { "internalType": "address", "name": "_to", "type": "address" },
+      { "internalType": "bytes", "name": "_encryptedMessage", "type": "bytes" },
+      { "internalType": "uint256", "name": "_timestamp", "type": "uint256" }
+    ],
+    "name": "emitMessageSent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_incident", "type": "address" },
+      { "internalType": "uint256", "name": "_offerId", "type": "uint256" },
+      { "internalType": "uint8", "name": "_proposer", "type": "uint8" },
+      { "internalType": "uint256", "name": "_returnAmount", "type": "uint256" },
+      { "internalType": "uint256", "name": "_validUntil", "type": "uint256" },
+      { "internalType": "string", "name": "_protocolName", "type": "string" }
+    ],
+    "name": "emitNewOffer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_incident", "type": "address" },
+      { "internalType": "uint256", "name": "_offerId", "type": "uint256" },
+      { "internalType": "uint8", "name": "_proposer", "type": "uint8" },
+      { "internalType": "uint256", "name": "_returnAmount", "type": "uint256" },
+      { "internalType": "uint256", "name": "_validUntil", "type": "uint256" },
+      { "internalType": "string", "name": "_protocolName", "type": "string" }
+    ],
+    "name": "emitOfferAccepted",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_incident", "type": "address" },
+      { "internalType": "uint256", "name": "_offerId", "type": "uint256" },
+      { "internalType": "uint8", "name": "_proposer", "type": "uint8" },
+      { "internalType": "uint256", "name": "_returnAmount", "type": "uint256" },
+      { "internalType": "uint256", "name": "_validUntil", "type": "uint256" },
+      { "internalType": "string", "name": "_protocolName", "type": "string" }
+    ],
+    "name": "emitOfferRejected",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_incidentAddress",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "_creator", "type": "address" },
+      { "internalType": "address", "name": "_hacker", "type": "address" },
+      { "internalType": "bytes", "name": "_contractData", "type": "bytes" },
+      { "internalType": "uint256", "name": "_timestamp", "type": "uint256" }
+    ],
+    "name": "emitSignedContractEvent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "reset",
+    "outputs": [
+      { "internalType": "contract IReset", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

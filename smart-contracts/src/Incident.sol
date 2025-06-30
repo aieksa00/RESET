@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IReset.sol";
+import "./interfaces/IEventEmitter.sol";
+import "./interfaces/IFeeCalculator.sol";
 
 contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -58,6 +60,10 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
 
     address public reset;
 
+    IEventEmitter public eventEmitter;
+
+    IFeeCalculator public feeCalculator;
+
     modifier onlyHackerOrOwner() {
         if (_msgSender() != hackerAddress && _msgSender() != owner()) {
             revert OnlyHackerOrOwner();
@@ -82,7 +88,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         uint256 _initialOfferValidity,
         address _owner,
         address _weth,
-        uint256 _incidentId
+        uint256 _incidentId,
+        address _eventEmitter
     ) Ownable(_owner) {
         protocolName = _protocolName;
         exploitedAddress = _exploitedAddress;
@@ -94,24 +101,25 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         reset = _msgSender();
         incidentId = _incidentId;
 
-        address mailbox = IReset(reset).getMailbox();
-        bytes memory contractData = abi.encodePacked(
-            "Protocol agrees not to take any legal action against the hacker if the incident is resolved and they found common ground."
-        );
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, ) = mailbox.call(
-            abi.encodeWithSignature(
-                "signContract(uint256,bytes)",
-                _incidentId,
-                contractData
-            )
-        );
-        require(success, "Mailbox signContract failed");
+        eventEmitter = IEventEmitter(_eventEmitter);
 
-        _newOffer(Proposer.Protocol, _initialOfferAmount, _initialOfferValidity);
+        feeCalculator = IFeeCalculator(IReset(reset).feeCalculator());
+        
+        offers[offersCount] = Offer({
+            proposer: Proposer.Protocol,
+            returnAmount: _initialOfferAmount,
+            validUntil: _initialOfferValidity,
+            offerStatus: OfferStatus.Pending
+        });
+
+        offersCount++;
     }
 
     function newOffer(uint256 _returnAmount, uint256 _validUntil) external onlyHackerOrOwner nonReentrant {
+        if (status != Status.Active) {
+            revert IncidentNotActive();
+        }
+        
         if (_returnAmount > hackedAmount) {
             revert cantOfferMoreThanHackedAmount();
         }
@@ -129,11 +137,7 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             offerStatus: OfferStatus.Pending
         });
 
-        if (_proposer == Proposer.Hacker) {
-            weth.forceApprove(address(this), _returnAmount);
-        }
-
-        IReset(reset).emitNewOffer(
+        eventEmitter.emitNewOffer(
             address(this),
             offersCount,
             uint8(_proposer),
@@ -174,13 +178,29 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             _acceptOfferProtocol(offer);
         }
 
-        IReset(reset).emitOfferAccepted(
+        Offer storage initialOffer = offers[0];
+
+        eventEmitter.emitOfferAccepted(
             address(this),
             _offerId,
             uint8(offer.proposer),
             offer.returnAmount,
             offer.validUntil,
             protocolName
+        );
+
+        eventEmitter.emitIncidentEvent(
+            incidentId,
+            address(this),
+            protocolName,
+            hackedAmount,
+            exploitedAddress,
+            hackerAddress,
+            transactionHash,
+            initialOffer.returnAmount,
+            initialOffer.validUntil,
+            owner(),
+            uint8(status)
         );
     }
 
@@ -190,8 +210,8 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
 
         (uint256 feeAmount, uint256 payoutAmount) = _calculateFeeAndPayout(offer.returnAmount);
 
-        weth.safeTransfer(reset, feeAmount);
-        weth.safeTransfer(owner(), payoutAmount);
+        weth.safeTransferFrom(hackerAddress, reset, feeAmount);
+        weth.safeTransferFrom(hackerAddress, owner(), payoutAmount);
     }
 
     function _acceptOfferProtocol(Offer storage offer) internal onlyOwner {
@@ -204,13 +224,12 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         weth.safeTransferFrom(hackerAddress, _msgSender(), payoutAmount);
     }
 
-    function _calculateFeeAndPayout(uint256 amount) internal view returns (uint256 feeAmount, uint256 payoutAmount) {
-        uint256 fee = IReset(reset).getFee();
-        feeAmount = (amount * fee) / 10000;
-        payoutAmount = amount - feeAmount;
+    function _calculateFeeAndPayout(uint256 _amount) internal view returns (uint256 feeAmount, uint256 payoutAmount) {
+        feeAmount = feeCalculator.calculateFee(_amount);
+        payoutAmount = _amount - feeAmount;
     }
 
-    function RejectOffer(uint256 _offerId) external onlyHackerOrOwner nonReentrant {
+    function rejectOffer(uint256 _offerId) external onlyHackerOrOwner nonReentrant {
         if (status != Status.Active) {
             revert IncidentNotActive();
         }
@@ -229,13 +248,9 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
             revert OfferNotActive();
         }
 
-        if (offer.proposer == Proposer.Protocol) {
-            _rejectOfferHacker(offer);
-        } else {
-            _rejectOfferProtocol(offer);
-        }
+        offer.offerStatus = OfferStatus.Rejected;
 
-        IReset(reset).emitOfferRejected(
+        eventEmitter.emitOfferRejected(
             address(this),
             _offerId,
             uint8(offer.proposer),
@@ -245,16 +260,21 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
         );
     }
 
-    function _rejectOfferHacker(Offer storage offer) internal onlyHacker {
-        offer.offerStatus = OfferStatus.Rejected;
-    }
-
-    function _rejectOfferProtocol(Offer storage offer) internal onlyOwner {
-        offer.offerStatus = OfferStatus.Rejected;
-    }
-
     function getHackerAddress() external view returns (address) {
         return hackerAddress;
+    }
+
+    function getStatus() external view returns (uint8) {
+        return uint8(status);
+    }
+
+    function getOffer(uint256 _offerId) external view returns (uint8, uint256, uint256, uint8) {
+        if (_offerId >= offersCount) {
+            revert OfferDoesNotExist();
+        }
+
+        Offer storage offer = offers[_offerId];
+        return (uint8(offer.proposer), offer.returnAmount, offer.validUntil, uint8(offer.offerStatus));
     }
 
     receive() external payable {}
