@@ -10,7 +10,7 @@ interface ChatWindowProps {
   title: string;
   hackerAddress: string;
   creatorAddress: string;
-  sharedSecret: Buffer;
+  sharedSecret: Uint8Array<ArrayBufferLike>;
   incidentAddress: string;
 }
 

@@ -5,7 +5,7 @@ interface ChatWindow {
   protocolName: string;
   hackerAddress: string;
   creatorAddress: string;
-  sharedSecret: Buffer;
+  sharedSecret: Uint8Array<ArrayBufferLike>;
   incidentAddress: string;
   isOpen: boolean;
   position: { x: number; y: number };
@@ -13,7 +13,7 @@ interface ChatWindow {
 
 interface ChatWindowContextType {
   chatWindows: Map<string, ChatWindow>;
-  openChat: (id: string, name: string, hackerAddress: string, creatorAddress: string, sharedSecret: Buffer, incidentAddress: string) => void;
+  openChat: (id: string, name: string, hackerAddress: string, creatorAddress: string, sharedSecret: Uint8Array<ArrayBufferLike>, incidentAddress: string) => void;
   closeChat: (id: string) => void;
   updatePosition: (id: string, position: { x: number; y: number }) => void;
 }
@@ -23,7 +23,7 @@ const ChatWindowContext = createContext<ChatWindowContextType | undefined>(undef
 export function ChatWindowProvider({ children }: { children: React.ReactNode }) {
   const [chatWindows, setChatWindows] = useState<Map<string, ChatWindow>>(new Map());
 
-  const openChat = (id: string, name: string, hackerAddress: string, creatorAddress: string, sharedSecret: Buffer, incidentAddress: string) => {
+  const openChat = (id: string, name: string, hackerAddress: string, creatorAddress: string, sharedSecret: Uint8Array<ArrayBufferLike>, incidentAddress: string) => {
     setChatWindows((current) => {
       const newWindows = new Map(current);
       newWindows.set(id, {

@@ -11,6 +11,15 @@ declare global {
   }
 }
 
+export interface MessageSentDTO {
+  id: string;
+  incidentAddress: string;
+  from: string;
+  to: string;
+  encryptedMessage: string;
+  timestamp: number;
+}
+
 
 /**
  * Derives a valid secp256k1 private key from a hash.
@@ -162,4 +171,35 @@ export function splitIvAndCiphertext(combined: Uint8Array): { iv: Uint8Array, ci
   const iv = combined.slice(0, 12);
   const ciphertext = combined.slice(12);
   return { iv, ciphertext };
+}
+
+export function hexStringToUint8Array(hexString: string): Uint8Array {
+  if (hexString.startsWith('0x')) {
+    hexString = hexString.slice(2);
+  }
+  if (hexString.length % 2 !== 0) {
+    hexString = '0' + hexString;
+  }
+  const bytes = new Uint8Array(hexString.length / 2);
+  for (let i = 0; i < hexString.length; i += 2) {
+    bytes[i / 2] = parseInt(hexString.substr(i, 2), 16);
+  }
+  return bytes;
+}
+
+export function decryptAllMessages(messages: MessageSentDTO[], sharedSecret: Uint8Array<ArrayBufferLike>): { iv: Uint8Array, ciphertext: Uint8Array } {
+  messages.forEach(async (message) => {
+    console.log(`Decrypting message ${message.encryptedMessage}`);
+    // Convert hex string to Uint8Array
+    const encryptedBytes = hexStringToUint8Array(message.encryptedMessage);
+    const { iv, ciphertext } = splitIvAndCiphertext(encryptedBytes);
+
+    try {
+      const decrypted = await decryptMessage(sharedSecret, ciphertext.buffer, iv);
+      console.log(`Decrypted message:`, decrypted);
+    } catch (e) {
+      console.error(`Failed to decrypt message ${message.id}:`, e);
+    }
+  });
+  return { iv: new Uint8Array(), ciphertext: new Uint8Array() }; // Return empty for now, as we are not using this return value
 }

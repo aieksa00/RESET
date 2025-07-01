@@ -52,3 +52,22 @@ export function RegistredPublicKeysQuery(userAddress: string): string {
     }
   `;
 }
+
+export function MessageSentsQuery(incidentAddress: string): string {
+  return gql`
+    {
+      messageSents(
+        where: { incidentAddress: "${incidentAddress}" }
+        orderBy: timestamp
+        orderDirection: asc
+      ) {
+        id
+        incidentAddress
+        from
+        to
+        encryptedMessage
+        timestamp
+      }
+    }
+  `;
+}

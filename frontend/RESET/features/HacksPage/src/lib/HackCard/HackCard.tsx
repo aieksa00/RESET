@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { formatEther, getAddress } from 'ethers';
 import styles from './HackCard.module.css';
-import { HackDto, MailboxContractAddress, RESETRoutes } from 'models';
+import { HackDto, MailboxContractAddress, MessageSentsQuery, RESETRoutes } from 'models';
 import { useAccount } from 'wagmi';
 import { shortenAddress } from '../HacksService/HacksService';
 import { useNavigate } from 'react-router-dom';
 import { useChatWindows } from '@providers';
-import { generateSharedSecret, generateECDHKeypairFromHash, signMessageWithMetamask, registerPublicKey, ensureResetPrivateKey } from "SCService";
+import { generateSharedSecret, generateECDHKeypairFromHash, signMessageWithMetamask, registerPublicKey, ensureResetPrivateKey, decryptAllMessages, hexStringToUint8Array } from "SCService";
 import { GraphQueryAPIKey, GraphQueryUrl, RegistredPublicKeysQuery } from 'models';
 import { useQuery } from '@tanstack/react-query';
 import { request } from 'graphql-request';
@@ -14,6 +14,15 @@ import { request } from 'graphql-request';
 export interface RegisteredPublicKeyDTO {
   user: string;
   publicKey: string;
+}
+
+export interface MessageSentDTO {
+  id: string;
+  incidentAddress: string;
+  from: string;
+  to: string;
+  encryptedMessage: string;
+  timestamp: number;
 }
 
 
@@ -48,6 +57,18 @@ export function HackCard({ hack }: { hack: HackDto }) {
     retryDelay: 1000,
   });
 
+  const { data: data2, status: status2 } = useQuery({
+    queryKey: ['messageSents', hack.incidentAddress],
+    async queryFn(): Promise<{ messageSents: MessageSentDTO[] }> {
+      return await request(GraphQueryUrl, MessageSentsQuery(hack.incidentAddress), {}, { Authorization: `Bearer ${GraphQueryAPIKey}` });
+    },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    enabled: !!hack.incidentAddress,
+    retry: 2,
+    retryDelay: 1000,
+  });
+
   useEffect(() => {
     const normalizedAddress = address ? getAddress(address).toLowerCase() : '';
     const normalizedCreator = getAddress(hack.creator).toLowerCase();
@@ -72,20 +93,6 @@ export function HackCard({ hack }: { hack: HackDto }) {
   if (!resetPrivateKey) return;
 
 
-    // Convert hex string public key to Uint8Array
-    function hexStringToUint8Array(hexString: string): Uint8Array {
-      if (hexString.startsWith('0x')) {
-        hexString = hexString.slice(2);
-      }
-      if (hexString.length % 2 !== 0) {
-        hexString = '0' + hexString;
-      }
-      const bytes = new Uint8Array(hexString.length / 2);
-      for (let i = 0; i < hexString.length; i += 2) {
-        bytes[i / 2] = parseInt(hexString.substr(i, 2), 16);
-      }
-      return bytes;
-    }
 
     //CITANJE PUBLICKEY IZ CONTRACTA
     let otherPublicKey = data?.mailboxPublicKeyRegistereds?.[0]?.publicKey;
@@ -109,7 +116,8 @@ export function HackCard({ hack }: { hack: HackDto }) {
 
     console.log('Shared Secret:', sharedSecret);
 
-    // TODO: loadAllMessages(sharedSecret, hack.incidentAddress);  SA GRAFA
+    decryptAllMessages(data2?.messageSents ?? [], sharedSecret);
+
 
     openChat(hack.id, hack.protocolName, hack.hackerAddress, hack.creator, sharedSecret, hack.incidentAddress);
   };
