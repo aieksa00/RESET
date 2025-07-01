@@ -4,20 +4,22 @@ pragma solidity ^0.8.24;
 import "./interfaces/IReset.sol";
 import "./interfaces/IIncident.sol";
 import "./interfaces/IEventEmitter.sol";
+import "./interfaces/IMailbox.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 interface IOwnable {
     function owner() external view returns (address);
 }
 
-contract Mailbox is ReentrancyGuard{
+contract Mailbox is IMailbox, ReentrancyGuard{
     error IncidentDoesNotExist();
     error NoPublicKeyForRecipient();
     error NotAuthorized();
     error InvalidPublicKeyLength();
 
-    IReset public reset;
+    string public constant CHAT_INTRO_MESSAGE = "I want to chat";
 
+    IReset public reset;
     IEventEmitter public eventEmitter;
 
     mapping(address => bytes) public publicKeys;

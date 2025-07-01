@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/IEventEmitter.sol";
 import "./interfaces/IIncident.sol";
+import "./interfaces/IMailbox.sol";
 
 contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -18,6 +19,7 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     error CantBeZero();
     error MailboxAlreadySet();
     error EventEmitterAlreadySet();
+    error MailboxPublicKeyNotRegistered();
 
     struct IncidentRequest {
         string protocolName;
@@ -33,14 +35,13 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
 
     mapping(uint256 => IncidentRequest) public incidentRequests;
     uint256 public incidentRequestCount;
+    
     address[] public incidents;
     mapping(address => bool) public isIncident;
 
     address public weth;
     address public mailbox;
-
     IEventEmitter public eventEmitter;
-
     address public feeCalculator;
 
     constructor(address _weth, address _feeCalculator) Ownable(_msgSender()) {
@@ -91,6 +92,12 @@ contract Reset is IReset, Ownable2Step, ReentrancyGuard {
     ) external nonReentrant {
         if (_initialOfferAmount > _hackedAmount) {
             revert cantOfferMoreThanHackedAmount();
+        }
+
+        bytes memory mailboxPublicKey = IMailbox(mailbox).getPublicKey(_msgSender());
+
+        if (mailboxPublicKey.length == 0) {
+            revert MailboxPublicKeyNotRegistered();
         }
 
         incidentRequests[incidentRequestCount] = IncidentRequest({

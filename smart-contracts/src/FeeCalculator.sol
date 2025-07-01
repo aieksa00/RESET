@@ -6,6 +6,12 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "./interfaces/IFeeCalculator.sol";
 
 contract FeeCalculator is IFeeCalculator, Ownable2Step {
+    error InvalidInput();
+    error TimelockNotExpired();
+    error DurationMustBeGreaterThanZero();
+    error InvalidAddress();
+    error StalePrice();
+
     AggregatorV3Interface public priceFeed;
 
     // Fee tiers and percentages (in basis points, e.g., 100 = 1%)
@@ -29,7 +35,9 @@ contract FeeCalculator is IFeeCalculator, Ownable2Step {
         uint256[] memory _usdTiers,
         uint256[] memory _bpsTiers
     ) Ownable(_msgSender()) {
-        require(_bpsTiers.length == _usdTiers.length + 1, "Invalid input");
+        if (_bpsTiers.length != _usdTiers.length + 1) {
+            revert InvalidInput();
+        }
         priceFeed = AggregatorV3Interface(_priceFeed);
         usdTiers = _usdTiers;
         bpsTiers = _bpsTiers;
@@ -37,14 +45,18 @@ contract FeeCalculator is IFeeCalculator, Ownable2Step {
     }
 
     function scheduleFeeTiers(uint256[] calldata _usdTiers, uint256[] calldata _bpsTiers) external onlyOwner {
-        require(_bpsTiers.length == _usdTiers.length + 1, "Invalid input");
+        if (_bpsTiers.length != _usdTiers.length + 1) {
+            revert InvalidInput();
+        }
         pendingUsdTiers = _usdTiers;
         pendingBpsTiers = _bpsTiers;
         feeChangeTimestamp = block.timestamp + timelockDuration;
     }
 
     function executeFeeTiers() external onlyOwner {
-        require(feeChangeTimestamp != 0 && block.timestamp >= feeChangeTimestamp, "Timelock not expired");
+        if (feeChangeTimestamp == 0 || block.timestamp < feeChangeTimestamp) {
+            revert TimelockNotExpired();
+        }
         usdTiers = pendingUsdTiers;
         bpsTiers = pendingBpsTiers;
         delete pendingUsdTiers;
@@ -53,26 +65,34 @@ contract FeeCalculator is IFeeCalculator, Ownable2Step {
     }
 
     function scheduleTimelockDuration(uint256 _newDuration) external onlyOwner {
-        require(_newDuration > 0, "Duration must be > 0");
+        if (_newDuration == 0) {
+            revert DurationMustBeGreaterThanZero();
+        }
         pendingTimelockDuration = _newDuration;
         timelockChangeTimestamp = block.timestamp + timelockDuration;
     }
 
     function executeTimelockDuration() external onlyOwner {
-        require(timelockChangeTimestamp != 0 && block.timestamp >= timelockChangeTimestamp, "Timelock not expired");
+        if (timelockChangeTimestamp == 0 || block.timestamp < timelockChangeTimestamp) {
+            revert TimelockNotExpired();
+        }
         timelockDuration = pendingTimelockDuration;
         pendingTimelockDuration = 0;
         timelockChangeTimestamp = 0;
     }
 
     function schedulePriceFeed(address _newPriceFeed) external onlyOwner {
-        require(_newPriceFeed != address(0), "Invalid address");
+        if (_newPriceFeed == address(0)) {
+            revert InvalidAddress();
+        }
         pendingPriceFeed = _newPriceFeed;
         priceFeedChangeTimestamp = block.timestamp + timelockDuration;
     }
 
     function executePriceFeed() external onlyOwner {
-        require(priceFeedChangeTimestamp != 0 && block.timestamp >= priceFeedChangeTimestamp, "Timelock not expired");
+        if (priceFeedChangeTimestamp == 0 || block.timestamp < priceFeedChangeTimestamp) {
+            revert TimelockNotExpired();
+        }
         priceFeed = AggregatorV3Interface(pendingPriceFeed);
         pendingPriceFeed = address(0);
         priceFeedChangeTimestamp = 0;
@@ -80,7 +100,9 @@ contract FeeCalculator is IFeeCalculator, Ownable2Step {
 
     function getLatestEthUsdPrice() public view returns (uint256) {
         (, int256 price, , uint256 updatedAt,) = priceFeed.latestRoundData();
-        require(updatedAt >= block.timestamp - 1 hours, "Stale price");
+        if (updatedAt < block.timestamp - 30 minutes) {
+            revert StalePrice();
+        }
         return uint256(price);
     }
 

@@ -77,6 +77,9 @@ contract ResetTest is Test {
         uint256 initialOfferAmount = 0.5 ether;
         uint256 initialOfferValidity = block.timestamp + 1 days;
 
+        bytes memory dummyPublicKey = hex"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40";
+        mailbox.registerPublicKey(dummyPublicKey);
+
         vm.expectEmit(true, true, false, false, address(eventEmitter));
         emit IncidentRequested(0, address(this));
         reset.requestIncident(
@@ -102,6 +105,9 @@ contract ResetTest is Test {
         bytes32 txHash = keccak256("txhash");
         uint256 initialOfferAmount = 0.5 ether;
         uint256 initialOfferValidity = block.timestamp + 1 days;
+
+        bytes memory dummyPublicKey = hex"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40";
+        mailbox.registerPublicKey(dummyPublicKey);
 
         reset.requestIncident(
             protocolName,
@@ -135,6 +141,9 @@ contract ResetTest is Test {
         bytes32 txHash = keccak256("txhash");
         uint256 initialOfferAmount = 0.5 ether;
         uint256 initialOfferValidity = block.timestamp + 1 days;
+
+        bytes memory dummyPublicKey = hex"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40";
+        mailbox.registerPublicKey(dummyPublicKey);
 
         reset.requestIncident(
             protocolName,
@@ -171,6 +180,9 @@ contract ResetTest is Test {
         bytes32 txHash = keccak256("txhash");
         uint256 initialOfferAmount = 0.5 ether;
         uint256 initialOfferValidity = block.timestamp + 1 days;
+
+        bytes memory dummyPublicKey = hex"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40";
+        mailbox.registerPublicKey(dummyPublicKey);
 
         reset.requestIncident(
             protocolName,
@@ -218,40 +230,83 @@ contract ResetTest is Test {
     }
 
     function testHackerCreatesOffer_ExpectEvent() public {
-    string memory protocolName = "TestProtocol";
-    uint256 hackedAmount = 1 ether;
-    bytes32 txHash = keccak256("txhash");
-    uint256 initialOfferAmount = 0.5 ether;
-    uint256 initialOfferValidity = block.timestamp + 1 days;
+        string memory protocolName = "TestProtocol";
+        uint256 hackedAmount = 1 ether;
+        bytes32 txHash = keccak256("txhash");
+        uint256 initialOfferAmount = 0.5 ether;
+        uint256 initialOfferValidity = block.timestamp + 1 days;
 
-    reset.requestIncident(
-        protocolName,
-        exploited,
-        hackedAmount,
-        hacker,
-        txHash,
-        initialOfferAmount,
-        initialOfferValidity
-    );
-    reset.approveIncident(0);
+        bytes memory dummyPublicKey = hex"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40";
+        mailbox.registerPublicKey(dummyPublicKey);
 
-    address incidentAddr = reset.getIncident(0);
+        reset.requestIncident(
+            protocolName,
+            exploited,
+            hackedAmount,
+            hacker,
+            txHash,
+            initialOfferAmount,
+            initialOfferValidity
+        );
+        reset.approveIncident(0);
 
-    uint256 hackerOfferAmount = 0.3 ether;
-    uint256 hackerOfferValidity = block.timestamp + 2 days;
+        address incidentAddr = reset.getIncident(0);
 
-    vm.expectEmit(true, true, true, true, address(eventEmitter));
-    emit OfferEvent(
-        incidentAddr,
-        1, // offerId (0 je inicijalni, 1 je novi)
-        uint8(0), // Proposer.Hacker
-        hackerOfferAmount,
-        hackerOfferValidity,
-        protocolName,
-        0 // OfferEventType.New
-    );
+        uint256 hackerOfferAmount = 0.3 ether;
+        uint256 hackerOfferValidity = block.timestamp + 2 days;
 
-    vm.prank(hacker);
-    IIncident(incidentAddr).newOffer(hackerOfferAmount, hackerOfferValidity);
-}
+        vm.expectEmit(true, true, true, true, address(eventEmitter));
+        emit OfferEvent(
+            incidentAddr,
+            1,
+            uint8(0), // Proposer.Hacker
+            hackerOfferAmount,
+            hackerOfferValidity,
+            protocolName,
+            0 // OfferEventType.New
+        );
+
+        vm.prank(hacker);
+        IIncident(incidentAddr).newOffer(hackerOfferAmount, hackerOfferValidity);
+    }
+
+    function testCannotRequestIncidentWithTooLargeOffer() public {
+        string memory protocolName = "TestProtocol";
+        uint256 hackedAmount = 1 ether;
+        uint256 initialOfferAmount = 2 ether;
+        uint256 initialOfferValidity = block.timestamp + 1 days;
+        bytes32 txHash = keccak256("txhash");
+        bytes memory dummyPublicKey = hex"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40";
+        mailbox.registerPublicKey(dummyPublicKey);
+
+        vm.expectRevert(Reset.cantOfferMoreThanHackedAmount.selector);
+        reset.requestIncident(protocolName, exploited, hackedAmount, hacker, txHash, initialOfferAmount, initialOfferValidity);
+    }
+
+    function testCannotRequestIncidentWithoutMailboxKey() public {
+        string memory protocolName = "TestProtocol";
+        uint256 hackedAmount = 1 ether;
+        uint256 initialOfferAmount = 0.5 ether;
+        uint256 initialOfferValidity = block.timestamp + 1 days;
+        bytes32 txHash = keccak256("txhash");
+
+        vm.expectRevert(Reset.MailboxPublicKeyNotRegistered.selector);
+        reset.requestIncident(protocolName, exploited, hackedAmount, hacker, txHash, initialOfferAmount, initialOfferValidity);
+    }
+
+    function testCannotApproveAlreadyApprovedIncident() public {
+        string memory protocolName = "TestProtocol";
+        uint256 hackedAmount = 1 ether;
+        uint256 initialOfferAmount = 0.5 ether;
+        uint256 initialOfferValidity = block.timestamp + 1 days;
+        bytes32 txHash = keccak256("txhash");
+        bytes memory dummyPublicKey = hex"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40";
+        mailbox.registerPublicKey(dummyPublicKey);
+
+        reset.requestIncident(protocolName, exploited, hackedAmount, hacker, txHash, initialOfferAmount, initialOfferValidity);
+        reset.approveIncident(0);
+
+        vm.expectRevert(Reset.IncidentAlreadyApproved.selector);
+        reset.approveIncident(0);
+    }
 }

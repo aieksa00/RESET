@@ -55,13 +55,10 @@ contract Incident is IIncident, Ownable2Step, ReentrancyGuard {
     uint256 public offersCount = 0;
 
     Status public status;
-
+    
     IERC20 public weth;
-
     address public reset;
-
     IEventEmitter public eventEmitter;
-
     IFeeCalculator public feeCalculator;
 
     modifier onlyHackerOrOwner() {
