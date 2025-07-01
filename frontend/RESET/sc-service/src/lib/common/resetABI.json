@@ -199,6 +199,7 @@
   { "type": "error", "name": "IncidentAlreadyApproved", "inputs": [] },
   { "type": "error", "name": "IncidentDoesNotExist", "inputs": [] },
   { "type": "error", "name": "MailboxAlreadySet", "inputs": [] },
+  { "type": "error", "name": "MailboxPublicKeyNotRegistered", "inputs": [] },
   { "type": "error", "name": "OwnableInvalidOwner", "inputs": [{ "name": "owner", "type": "address", "internalType": "address" }] },
   { "type": "error", "name": "OwnableUnauthorizedAccount", "inputs": [{ "name": "account", "type": "address", "internalType": "address" }] },
   { "type": "error", "name": "ReentrancyGuardReentrantCall", "inputs": [] },

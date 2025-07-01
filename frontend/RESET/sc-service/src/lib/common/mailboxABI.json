@@ -11,6 +11,13 @@
   { "type": "receive", "stateMutability": "payable" },
   {
     "type": "function",
+    "name": "CHAT_INTRO_MESSAGE",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "eventEmitter",
     "inputs": [],
     "outputs": [{ "name": "", "type": "address", "internalType": "contract IEventEmitter" }],
