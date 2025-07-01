@@ -39,3 +39,16 @@ export const HacksQuery = gql`
     }
   }
 `;
+
+export function RegistredPublicKeysQuery(userAddress: string): string {
+  return gql`
+    {
+      mailboxPublicKeyRegistereds (
+        where: { user: "${userAddress}" }
+      ) {
+        user
+        publicKey
+      }
+    }
+  `;
+}

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useAccount } from 'wagmi';
 import styles from './CreateHackPage.module.css';
 import { RequestHackDto, RESETRoutes } from 'models';
-import { RequestHack } from 'SCService';
+import { ensureResetPrivateKey, RequestHack } from 'SCService';
 import { useNavigate } from 'react-router-dom';
 
 export function CreateHackPage() {
@@ -28,6 +28,7 @@ export function CreateHackPage() {
   }, [isConnected, address, setValue]);
 
   const onSubmit = async (data: RequestHackDto) => {
+    await ensureResetPrivateKey(address)
     const goToAllHacks = await RequestHack(data);
 
     if(goToAllHacks){

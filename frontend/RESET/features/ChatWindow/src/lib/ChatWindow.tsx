@@ -2,6 +2,8 @@ import styles from './ChatWindow.module.css';
 import { useState, useRef, useEffect } from 'react';
 import { useChatWindows } from '@providers';
 import { useForm } from 'react-hook-form';
+import { encryptMessage, decryptMessage, combineIvAndCiphertext, splitIvAndCiphertext, sendMessage } from 'SCService';
+import { useAccount } from 'wagmi';
 
 interface ChatWindowProps {
   id: string;
@@ -9,6 +11,7 @@ interface ChatWindowProps {
   hackerAddress: string;
   creatorAddress: string;
   sharedSecret: Buffer;
+  incidentAddress: string;
 }
 
 export function ChatWindow(props: ChatWindowProps) {
@@ -18,6 +21,8 @@ export function ChatWindow(props: ChatWindowProps) {
 
   const { chatWindows, closeChat, updatePosition } = useChatWindows();
   const chatWindow = chatWindows.get(props.id);
+
+  const { address } = useAccount();
 
   const {
     register,
@@ -29,9 +34,18 @@ export function ChatWindow(props: ChatWindowProps) {
     },
   });
 
-  const onSubmit = (messageData: { message: string }) => {
-    console.log('Encrypt me:', props.sharedSecret);
-    console.log('Message sent:', messageData.message);
+  const onSubmit = async (messageData: { message: string }) => {
+    let { ciphertext, iv } = await encryptMessage(props.sharedSecret, messageData.message);
+
+    const combined = combineIvAndCiphertext(iv, ciphertext);
+
+
+    if (address?.toLowerCase() == props.hackerAddress.toLowerCase()) {
+      await sendMessage(props.incidentAddress, props.creatorAddress, combined);
+    } else if (address?.toLowerCase() == props.creatorAddress.toLowerCase()) {
+      await sendMessage(props.incidentAddress, props.hackerAddress, combined);
+    }
+    
   };
 
   useEffect(() => {
