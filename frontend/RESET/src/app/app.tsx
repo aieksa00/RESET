@@ -1,5 +1,6 @@
 // Uncomment this line to use CSS modules
 import styles from './app.module.css';
+import logo from '../assets/logo.png';
 
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { RESETRoutes } from 'models';
@@ -45,11 +46,10 @@ function AppContent() {
         </Routes>
       ) : (
         <div className={styles['app-layout']}>
-          <div className={styles['sidebar']}></div>
-
           <div className={styles['routes']}>
             <div className={styles['header']}>
               <span className={styles['reset-label']}>RESET</span>
+              <img src={logo} alt="RESET Logo" className={styles['logo']} />
               <div className={styles['connect-button-container']}>
                 <ConnectButton />
               </div>
@@ -62,7 +62,7 @@ function AppContent() {
           </div>
 
           {Array.from(chatWindows.entries()).map(([id, chat]) => (
-            <ChatWindow key={id} id={id} title={`Chat - ${chat.protocolName}`} />
+            <ChatWindow key={id} id={id} title={`Chat - ${chat.protocolName}`} hackerAddress={chat.hackerAddress} creatorAddress={chat.creatorAddress} sharedSecret={chat.sharedSecret} incidentAddress={chat.incidentAddress}/>
           ))}
         </div>
       )}

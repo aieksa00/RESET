@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 import { RESETRoutes } from 'models';
+import logo from '../assets/logo.png';
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -19,6 +20,9 @@ export function LandingPage() {
         <h1 className={styles['landing-page-h1']} onClick={handleHackerClick}>
           I AM HACKER
         </h1>
+      </div>
+      <div className={styles['center-logo']}>
+        <img src={logo} alt="RESET Logo" className={styles['logo']} />
       </div>
       <div className={styles['right-side']}>
         <h1 className={styles['landing-page-h1']} onClick={handleHackedClick}>

@@ -39,3 +39,35 @@ export const HacksQuery = gql`
     }
   }
 `;
+
+export function RegistredPublicKeysQuery(userAddress: string): string {
+  return gql`
+    {
+      mailboxPublicKeyRegistereds (
+        where: { user: "${userAddress}" }
+      ) {
+        user
+        publicKey
+      }
+    }
+  `;
+}
+
+export function MessageSentsQuery(incidentAddress: string): string {
+  return gql`
+    {
+      messageSents(
+        where: { incidentAddress: "${incidentAddress}" }
+        orderBy: timestamp
+        orderDirection: asc
+      ) {
+        id
+        incidentAddress
+        from
+        to
+        encryptedMessage
+        timestamp
+      }
+    }
+  `;
+}

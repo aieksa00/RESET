@@ -1,0 +1,4 @@
+export interface RegisteredPublicKeyDTO {
+  user: string;
+  publicKey: string;
+}
