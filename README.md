@@ -41,6 +41,9 @@ To make Reset more flexible and production-ready, the following enhancements cou
   - DAO/multisig governance recognition  
   - ENS-based identity mapping
 
+- **In-house indexer**  
+By developing an in-house indexer for our EventEmitter, we will achieve cheaper and faster data fetching.
+
 ---
 
 ## 📚 Quick Start
