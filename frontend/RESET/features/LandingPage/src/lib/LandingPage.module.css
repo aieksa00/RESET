@@ -1,50 +1,57 @@
-/*
- * Replace this with your own classes
- *
- * e.g.
- * .container {
- * }
-*/
 .loading-page {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-    background: #000; /* Black background */
-    color: #fff; /* White text */
-    font-family: 'Arial', sans-serif;
-  }
-  
-  .left-side,
-  .right-side {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    font-weight: bold;
-  }
-  
-  .left-side {
-    background: #17171d;
-  }
-  
-  .right-side {
-    background: #353543;
-  }
-  
-  .landing-page-h1 {
-    transition: transform 0.3s ease, color 0.3s ease;
-  }
-  
-  .landing-page-h1:hover {
-    transform: scale(1.2);
-  }
-  
-  .left-side h1:hover {
-    text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 100px #ff4500;
-  }
-  
-  .right-side h1:hover {
-    text-shadow: 0 0 10px #9932cc, 0 0 20px #9932cc, 0 0 100px #9932cc;
-  }
-  
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: #000; 
+  color: #fff;
+  font-family: 'Arial', sans-serif;
+}
+
+.left-side,
+.right-side {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.left-side {
+  background: #353543;
+}
+
+.right-side {
+  background: #17171d;
+}
+
+.landing-page-h1 {
+  margin: 0px 16px;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.landing-page-h1:hover {
+  transform: scale(1.2);
+}
+
+.left-side h1:hover {
+  text-shadow: 0 0 10px #17171d, 0 0 20px #17171d, 0 0 100px #17171d;
+}
+
+.right-side h1:hover {
+  text-shadow: 0 0 10px #9932cc, 0 0 20px #9932cc, 0 0 100px #9932cc;
+}
+
+.center-logo {
+  position: absolute;
+  left: 50%;
+  top: 150px;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.logo {
+  width: 300px; /* Adjust size as needed */
+  height: auto;
+  filter: brightness(0.9); /* Optional: adjust the brightness to match your theme */
+}

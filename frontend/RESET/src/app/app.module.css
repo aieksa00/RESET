@@ -5,13 +5,6 @@
   width: 100vw; /* Full viewport width */
 }
 
-/* Sidebar styling */
-.sidebar {
-  background-color: #17171d; /* Dark background */
-  border-right: 2px solid #121217; /* Optional: Divider */
-  width: 150px;
-}
-
 /* Scrollbar styling */
 .routes::-webkit-scrollbar {
   width: 8px; /* Width of the scrollbar */
@@ -34,7 +27,7 @@
 .routes {
   padding: 32px; /* Padding for larger screens */
   overflow-y: auto; /* Enable scrolling if content overflows */
-  width: calc(100% - 150px);
+  width: 100%;
 }
 
 /* Header styling (RESET label and ConnectButton) */
@@ -56,4 +49,10 @@
 /* ConnectButton styling */
 .connect-button-container {
   margin-left: auto;
+}
+
+.logo {
+  width: 45px; /* Adjust size as needed */
+  height: auto;
+  filter: brightness(0.9); /* Optional: adjust the brightness to match your theme */
 }

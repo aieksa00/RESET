@@ -390,7 +390,7 @@ export async function signMessageWithMetamask(): Promise<string> {
     return signature;
 }
 
-export async function registerPublicKey(publicKey: Uint8Array<ArrayBuffer>): Promise<boolean> {
+export async function RegisterPublicKey(publicKey: Uint8Array<ArrayBuffer>): Promise<boolean> {
   // Check if MetaMask is installed and connected
   const isMetaMaskConnected = await CheckMetaMask();
   if (!isMetaMaskConnected) {
@@ -455,7 +455,7 @@ export async function registerPublicKey(publicKey: Uint8Array<ArrayBuffer>): Pro
   }
 }
 
-export async function sendMessage(incidentAddress: string, to: string, encryptedMessage: Uint8Array): Promise<boolean> {
+export async function SendMessage(incidentAddress: string, to: string, encryptedMessage: Uint8Array): Promise<boolean> {
   // Check if MetaMask is installed and connected
   const isMetaMaskConnected = await CheckMetaMask();
   if (!isMetaMaskConnected) {

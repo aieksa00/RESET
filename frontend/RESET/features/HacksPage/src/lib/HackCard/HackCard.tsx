@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { formatEther, getAddress } from 'ethers';
 import styles from './HackCard.module.css';
-import { HackDto, MailboxContractAddress, MessageSentsQuery, RESETRoutes } from 'models';
+import { HackDto, RESETRoutes } from 'models';
 import { useAccount } from 'wagmi';
 import { shortenAddress } from '../HacksService/HacksService';
 import { useNavigate } from 'react-router-dom';
 import { useChatWindows } from '@providers';
-import { generateSharedSecret, generateECDHKeypairFromHash, signMessageWithMetamask, registerPublicKey, ensureResetPrivateKey, decryptAllMessages, hexStringToUint8Array } from "SCService";
+import { generateSharedSecret, EnsureResetPrivateKey, hexStringToUint8Array } from "SCService";
 import { GraphQueryAPIKey, GraphQueryUrl, RegistredPublicKeysQuery } from 'models';
 import { useQuery } from '@tanstack/react-query';
 import { request } from 'graphql-request';
@@ -46,7 +46,7 @@ export function HackCard({ hack }: { hack: HackDto }) {
   }
 
   const { data, status } = useQuery({
-    queryKey: ['registredPublicKeys', otherPartyAddress], // Add specific query key
+    queryKey: ['registredPublicKeys', otherPartyAddress],
     async queryFn(): Promise<{ mailboxPublicKeyRegistereds: RegisteredPublicKeyDTO[] }> {
       return await request(GraphQueryUrl, RegistredPublicKeysQuery(otherPartyAddress!), {}, { Authorization: `Bearer ${GraphQueryAPIKey}` });
     },
@@ -57,24 +57,8 @@ export function HackCard({ hack }: { hack: HackDto }) {
     retryDelay: 1000,
   });
 
-  const { data: data2, status: status2 } = useQuery({
-    queryKey: ['messageSents', hack.incidentAddress],
-    async queryFn(): Promise<{ messageSents: MessageSentDTO[] }> {
-      return await request(GraphQueryUrl, MessageSentsQuery(hack.incidentAddress), {}, { Authorization: `Bearer ${GraphQueryAPIKey}` });
-    },
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    enabled: !!hack.incidentAddress,
-    retry: 2,
-    retryDelay: 1000,
-  });
-
   useEffect(() => {
-    const normalizedAddress = address ? getAddress(address).toLowerCase() : '';
-    const normalizedCreator = getAddress(hack.creator).toLowerCase();
-    const normalizedHackerAddress = getAddress(hack.hackerAddress).toLowerCase();
-
-    if (normalizedAddress === normalizedCreator || normalizedAddress === normalizedHackerAddress) {
+    if (normalizedAddress === normalizedCreator|| normalizedAddress === normalizedHackerAddress) {
       setCanSendMessage(true);
     } else {
       setCanSendMessage(false);
@@ -82,25 +66,21 @@ export function HackCard({ hack }: { hack: HackDto }) {
   }, [address, hack.creator, hack.hackerAddress]);
 
   const handleOfferDetails = () => {
-    console.log(`Incident address: ${hack.incidentAddress}`);
     navigation(RESETRoutes.HackDetails, {
       state: { hack },
     });
   };
 
   const handleSendMessage = async () => {
-    const resetPrivateKey = await ensureResetPrivateKey(address);
+    const resetPrivateKey = await EnsureResetPrivateKey(address);
   if (!resetPrivateKey) return;
-
-
-
     //CITANJE PUBLICKEY IZ CONTRACTA
-    let otherPublicKey = data?.mailboxPublicKeyRegistereds?.[0]?.publicKey;
+    const otherPublicKey = data?.mailboxPublicKeyRegistereds?.[0]?.publicKey;
     if (!otherPublicKey) {
       // handle error
       return;
     }
-    let otherPublicKeyBytes = hexStringToUint8Array(otherPublicKey);
+    const otherPublicKeyBytes = hexStringToUint8Array(otherPublicKey);
 
     // Add 0x04 prefix to make it a valid uncompressed public key for secp256k1
     const uncompressedPrefix = new Uint8Array([0x04]);
@@ -113,11 +93,6 @@ export function HackCard({ hack }: { hack: HackDto }) {
       hexStringToUint8Array(resetPrivateKey),
       otherPublicKeyWithPrefix
     );
-
-    console.log('Shared Secret:', sharedSecret);
-
-    decryptAllMessages(data2?.messageSents ?? [], sharedSecret);
-
 
     openChat(hack.id, hack.protocolName, hack.hackerAddress, hack.creator, sharedSecret, hack.incidentAddress);
   };

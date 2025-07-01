@@ -1,5 +1,6 @@
 import styles from './HacksPage.module.css';
 
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { request } from 'graphql-request';
@@ -8,6 +9,8 @@ import { HackDto, GraphQueryUrl, GraphQueryAPIKey, HacksQuery } from 'models';
 import { HackCard } from '../HackCard/HackCard';
 
 export function HacksPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+
   const { data, status, refetch } = useQuery({
     queryKey: ['incidentEvents'],
     async queryFn(): Promise<{ incidentEvents: HackDto[] }> {
@@ -22,6 +25,7 @@ export function HacksPage() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -30,7 +34,7 @@ export function HacksPage() {
   });
 
   const onSubmit = (searchData: { searchTerm: string }) => {
-    const term = searchData.searchTerm.toLowerCase();
+    setSearchTerm(searchData.searchTerm.toLowerCase());
   };
 
   const renderHacksList = () => {
@@ -64,9 +68,33 @@ export function HacksPage() {
       );
     }
 
+    const filteredHacks = searchTerm
+      ? data?.incidentEvents.filter((hack) => hack.protocolName.toLowerCase().includes(searchTerm))
+      : data?.incidentEvents || [];
+
+    if (!filteredHacks.length && status === 'success') {
+      return (
+        <div className={styles['no-hacks-container']}>
+          <div className={styles['no-hacks']}>
+            <h3>No hacks found matching "{searchTerm}"</h3>
+          </div>
+          <button
+            className={styles['refresh-button']}
+            onClick={() => {
+              setSearchTerm('');
+              reset({ searchTerm: '' });
+            }}
+            aria-label="Clear search"
+          >
+            ↻
+          </button>
+        </div>
+      );
+    }
+
     return (
       <div className={styles['hack-list']}>
-        {data.incidentEvents.map((hack, index) => (
+        {filteredHacks.map((hack, index) => (
           <HackCard key={index} hack={hack} />
         ))}
       </div>
@@ -92,9 +120,21 @@ export function HacksPage() {
           />
           {errors.searchTerm && <p className={styles['error-message']}>{errors.searchTerm.message}</p>}
         </div>
-        <button type="submit" className={styles['search-button']}>
-          Search
-        </button>
+        <div className={styles['actions']}>
+          <button type="submit" className={styles['search-button']}>
+            Search
+          </button>
+          <button
+            type="reset"
+            className={styles['search-button']}
+            onClick={() => {
+              setSearchTerm('');
+              reset({ searchTerm: '' });
+            }}
+          >
+            Clear
+          </button>
+        </div>
       </form>
       {renderHacksList()}
     </>

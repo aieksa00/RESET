@@ -2,8 +2,9 @@ import { ethers, getAddress, getBytes } from 'ethers';
 import resetAbi from './common/resetABI.json';
 import incidentAbi from './common/incidentABI.json';
 import * as crypto from 'crypto';
-import { CheckMetaMask, registerPublicKey, signMessageWithMetamask } from 'SCService';
+import { CheckMetaMask, RegisterPublicKey, signMessageWithMetamask } from './SmartContractService';
 import * as secp from '@noble/secp256k1';
+import { DecryptedMessageDto } from 'models';
 
 declare global {
   interface Window {
@@ -19,7 +20,6 @@ export interface MessageSentDTO {
   encryptedMessage: string;
   timestamp: number;
 }
-
 
 /**
  * Derives a valid secp256k1 private key from a hash.
@@ -106,20 +106,17 @@ export function uint8ArrayToHex(arr: Uint8Array): string {
     .join('');
 }
 
-
-
 /**
  * Ensures a reset private key exists for the given address.
  * Returns the private key as a hex string, or throws on error.
  */
-export async function ensureResetPrivateKey(address?: string): Promise<string | null> {
+export async function EnsureResetPrivateKey(address?: string): Promise<string | null> {
   if (!address) {
-    console.error('No connected address');
     return null;
   }
 
   const keyDictRaw = localStorage.getItem('resetPrivateKeyDict');
-  let keyDict: Record<string, string> = keyDictRaw ? JSON.parse(keyDictRaw) : {};
+  const keyDict: Record<string, string> = keyDictRaw ? JSON.parse(keyDictRaw) : {};
 
   const normalizedAddress = getAddress(address).toLowerCase();
   let resetPrivateKey = keyDict[normalizedAddress];
@@ -140,18 +137,14 @@ export async function ensureResetPrivateKey(address?: string): Promise<string | 
     keyDict[normalizedAddress] = resetPrivateKey;
     localStorage.setItem('resetPrivateKeyDict', JSON.stringify(keyDict));
 
-    // TO-DO: DODAJ PROVERU DA LI JE VEC REGISTROVAN JAVNI KLJUC PREKO GRAFA
-
     // 5. Register the public key (as 64 bytes, uncompressed, no 0x04 prefix)
     const publicKeyUncompressed = secp.getPublicKey(keypair.privateKey, false); // 65 bytes, starts with 0x04
     const publicKey64 = publicKeyUncompressed.slice(1); // Remove 0x04 prefix
-    const success = await registerPublicKey(publicKey64);
+    const success = await RegisterPublicKey(publicKey64);
     if (!success) {
-      console.error('Failed to register public key');
       return null;
     }
   }
-  console.log(`Reset private key for ${normalizedAddress}: ${resetPrivateKey}`);
 
   return resetPrivateKey;
 }
@@ -187,19 +180,25 @@ export function hexStringToUint8Array(hexString: string): Uint8Array {
   return bytes;
 }
 
-export function decryptAllMessages(messages: MessageSentDTO[], sharedSecret: Uint8Array<ArrayBufferLike>): { iv: Uint8Array, ciphertext: Uint8Array } {
+export function DecryptAllMessages(messages: MessageSentDTO[], sharedSecret: Uint8Array<ArrayBufferLike>): DecryptedMessageDto[] {
+  const decryptedMessages: DecryptedMessageDto[] = [];
+
   messages.forEach(async (message) => {
-    console.log(`Decrypting message ${message.encryptedMessage}`);
-    // Convert hex string to Uint8Array
     const encryptedBytes = hexStringToUint8Array(message.encryptedMessage);
     const { iv, ciphertext } = splitIvAndCiphertext(encryptedBytes);
 
     try {
       const decrypted = await decryptMessage(sharedSecret, ciphertext.buffer, iv);
-      console.log(`Decrypted message:`, decrypted);
+      decryptedMessages.push({
+        from: message.from,
+        to: message.to,
+        decryptedMessage: decrypted,
+        timestamp: message.timestamp
+      });
     } catch (e) {
       console.error(`Failed to decrypt message ${message.id}:`, e);
     }
   });
-  return { iv: new Uint8Array(), ciphertext: new Uint8Array() }; // Return empty for now, as we are not using this return value
+
+  return decryptedMessages;
 }

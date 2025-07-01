@@ -6,16 +6,16 @@
 }
 
 .form {
-  display: grid;
-  grid-template-rows: auto auto; /* Two rows: one for the search bar and one for the button */
-  grid-template-columns: 1fr; /* One column */
-  gap: 8px; /* Space between rows */
+  display: flex;
+  align-items: start;
+  gap: 16px;
   margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .input-container {
-  grid-row: 1;
-  grid-column: 1;
+  min-width: 250px;
+  flex: 1;
 }
 
 .search-bar {
@@ -41,9 +41,13 @@
   margin-top: 4px;
 }
 
+.actions {
+  display: flex;
+  gap: 8px;
+  height: 36px;
+}
+
 .search-button {
-  grid-row: 1; /* Second row */
-  grid-column: 2; /* First column */
   padding: 8px 16px;
   background-color: #6e00db;
   color: #fff;
@@ -51,7 +55,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  width: fit-content;
+  white-space: nowrap;
 }
 
 .search-button:hover {

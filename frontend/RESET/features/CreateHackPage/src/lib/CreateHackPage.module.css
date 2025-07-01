@@ -19,14 +19,15 @@
 }
 
 .hack-form fieldset {
-  border: none; /* Remove the default border */
-  margin: 0; /* Remove default margin */
-  padding: 0; /* Remove default padding */
+  border: none;
+  margin: 0;
+  padding: 0;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
+  margin-bottom: 16px;
 }
 
 .form-group label {
@@ -39,7 +40,6 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 16px;
-  margin-bottom: 16px;
 }
 
 .form-group input:disabled {
@@ -70,4 +70,10 @@
 .submit-button:disabled {
   background-color: #aaa;
   cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  justify-content: end;
+  margin-top: 8px;
 }
