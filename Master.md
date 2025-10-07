@@ -3,10 +3,32 @@ Ovo poglavlje sistematski prikazuje implementaciju platforme RESET kroz tri međ
 
 1.1 High‑level arhitektura platforme
 
-Arhitektura platforme RESET je slojevita i modularna, sa jasno odvojenim domenima odgovornosti: prezentacioni sloj (frontend), poslovna logika i interoperabilni servisi (backend, indeksi, subgraph), te sloj imutabilne logike i ekonomskih pravila (smart‑contracti). Takva separacija omogućava nezavisno razvijanje, skaliranje i testiranje pojedinačnih komponenti.
-Komunikacija između slojeva zasnovana je na dobro definisanim API‑jima i događajima. Smart‑contracti objavljuju događaje koji se indeksišu putem subgraph‑a i/ili posrednih servisnih komponenti; backend komponente obezbeđuju agregaciju i autorizovane operacije; frontend ostvaruje interakciju putem sigurne RPC veze i posrednih REST/GraphQL endpointa za preuzimanje agregiranih podataka.
-Arhitektonski zahtevi uključuju konzistentnost stanja, otpornost na greške i audibilnost. Konzistentnost se postiže determinističkim logikom u smart‑contractima i sinhronizacijom stanja kroz indekser/mehanizam za verifikaciju događaja. Audibilnost i verifikacija postignuti su kroz jasne transakcione zapise na blockchain‑u i dodatne logove u infrastrukturnim komponentama.
-Skalabilnost i performanse su adresirani horizontalnom separacijom odgovornosti: indeksi i subgraph omogućavaju brzo čitanje i upite, dok se teži operativni troškovi i složeni proračuni guraju u distribuirane backend servise ili off‑chain obračune, uz kriptografski dokaz usklađenosti sa on‑chain stanjem kada je potrebno.
+Platforma RESET implementirana je kao potpuno decentralizovano rešenje koje se oslanja isključivo na blockchain infrastrukturu, bez tradicionalnog backend sloja. Arhitektura se sastoji od tri ključne komponente: smart ugovora koji čine jezgro sistema, The Graph protokola za indeksiranje podataka, i web interfejsa koji omogućava interakciju sa platformom.
+
+Smart ugovori predstavljaju fundamentalni sloj platforme koji enkapsulira kompletnu poslovnu logiku i skladištenje podataka. Svi kritični podaci - od prijavljenih incidenata, preko ponuda za rešavanje sporova, do kriptovanih poruka između učesnika - čuvaju se direktno u blockchain transakcijama. Ovakav pristup garantuje potpunu transparentnost i nepromenljivost istorije interakcija, što je od posebnog značaja za uspostavljanje poverenja u kontekstu sajber incidenata.
+
+Za efikasno pretraživanje i pristup podacima, platforma koristi The Graph protokol koji indeksira blockchain događaje kroz GraphQL API. Ovo rešenje eliminiše potrebu za zasebnim backend servisima, istovremeno obezbeđujući performantno preuzimanje podataka za frontend aplikaciju. Subgraph definiše precizne sheme za mapiranje on-chain događaja u strukturirane podatke, omogućavajući kompleksne upite nad istorijom incidenata i komunikacija.
+
+Frontend aplikacija služi kao interfejs ka blockchain funkcionalnostima, pri čemu autentifikacija korisnika počiva isključivo na kriptografskim novčanicima (wallets). Nakon povezivanja novčanika, sistem automatski identifikuje ulogu korisnika upoređivanjem adrese sa registrovanim incidentima - ako se adresa podudara sa "hack-ovanom" ili "hakerskom" adresom, korisniku se otključavaju specifične funkcionalnosti:
+
+- Pregled i slanje kriptovanih poruka relevantnim stranama
+- Kreiranje ili prihvatanje ponuda za povraćaj sredstava
+- Praćenje statusa pregovora i verifikacija izvršenja dogovora
+
+Ovakva arhitektura eliminiše potrebu za centralnim autoritetom ili posrednikom, dok istovremeno održava visok nivo sigurnosti i privatnosti kroz end-to-end enkripciju poruka i striktnu kontrolu pristupa na nivou smart ugovora. Sva validacija prava pristupa i poslovna logika izvršava se kroz determinističke funkcije na lancu, čineći sistem otpornim na manipulaciju i pogodnim za nezavisnu verifikaciju.
+
+Smart ugovori su dizajnirani modularno, sa jasnom separacijom odgovornosti:
+- Registracija i upravljanje incidentima
+- Sistem za razmenu kriptovanih poruka
+- Upravljanje ponudama i njihovim statusima
+- Verifikacija izvršenja dogovora
+
+Ova arhitekturna odluka da se platform implementira kao potpuno on-chain rešenje donosi nekoliko ključnih prednosti:
+- Eliminacija rizika povezanih sa centralizovanom infrastrukturom
+- Garantovana dostupnost i nepromenljivost istorijskih podataka
+- Transparentna verifikacija svih interakcija
+- Prirodna otpornost na cenzuru i manipulaciju
+
 1.2 Implementacioni detalji
 
 Smart‑contract sloj: Implementacija obuhvata skup smart‑contracta koji enkapsuliraju ekonomska pravila, mehanizme za razmenu vrednosti i emitovanje događaja. Kontrakti su dizajnirani prema principima modularnosti i minimalne privilegije; svaka funkcija ima jasno određen stepen pristupa i gas optimizaciju. Verzije kontrakta su verzionisane i pokrivene unit i integracionim testovima.
